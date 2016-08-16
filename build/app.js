@@ -46887,8 +46887,8 @@ exports.createContext = Script.createContext = function (context) {
 
 },{"indexof":134}],227:[function(require,module,exports){
 module.exports = {
-  "AccessToken": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/AccessToken.sol.js"),
   "Disposable": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Disposable.sol.js"),
+  "AccessToken": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/AccessToken.sol.js"),
   "LockAPI": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js"),
   "LockAPIBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPIBase.sol.js"),
   "LogService": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js"),
@@ -46928,7 +46928,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[Disposable,AccessToken,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -47854,17 +47854,19 @@ angular.module("LockChain").factory("RegisterFactory", function(){
 ///////////////////////////////////////////////////////////////////////////////
 angular.module("LockChain").factory("LockFactory", function(){
 
-
+	///////////////////////////////////////////////////////////////////////////
+	// Factory Contract Deployments 
+	///////////////////////////////////////////////////////////////////////////
 	var lockContract = LockAPI.deployed();
 	var accessContract = TokenIssuer.deployed();
 
 	///////////////////////////////////////////////////////////////////////////
-	// Function Pointer Register
+	// Function Export Register
 	// Locks the Specified Resource by posting a trnsaction on the blockchain
 	///////////////////////////////////////////////////////////////////////////
 	// Parameters
 	// account 	: sender account
-	// resource  : address of the resource to lock
+	// resource : Resource object to register
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var register = function(account, resource, callback){
@@ -47877,6 +47879,15 @@ angular.module("LockChain").factory("LockFactory", function(){
 		});
 	};
 
+	///////////////////////////////////////////////////////////////////////////
+	// Function Export Transfer
+	// Transfers ownership of a previously registered resource
+	///////////////////////////////////////////////////////////////////////////
+	// Parameters
+	// account 	: sender account
+	// resource : Resource object to transfer
+	// callback : function to execute when done
+	///////////////////////////////////////////////////////////////////////////
 	var transfer = function(account, resource, newOwner, callback){
 		lockContract.Transfer(resource.address, newOwner, {from:account})
 		.then(function(result){
@@ -47887,45 +47898,48 @@ angular.module("LockChain").factory("LockFactory", function(){
 		});
 	};
 
+	///////////////////////////////////////////////////////////////////////////
+	// Function Export getRegisteredForAccount
+	// Returns the resourecs to which the use has some degree of access rights
+    // (a) Find teh resource addresses to which the user has rights
+    // (b) Load each resource
+    // Note due to restrictions in return types in Solidity this must be done
+    // Object by object. To make this more efficient we chain promises
+    // together and execute asynchronously
+	///////////////////////////////////////////////////////////////////////////
+	// Parameters
+	// account 	: sender account
+	// callback : function to execute when done
+	///////////////////////////////////////////////////////////////////////////
 	var getRegisteredForAccount = function(account, callback){
-
-		var dataItems=[];
+		
+		var deviceList = [];
+		var promises = [];
 		accessContract.GetTokensFor(account)
 		.then(function(result){
-			for(i=0; i<result.length; i++){
-				dataItems.push({address:result[i]});
-				return lockContract.lockAttrs(result[i])
+			for(i=0; i<result.length;i++){
+				deviceList.push({address:result[i]});
+				promises.push(lockContract.lockAttrs(result[i]));
 			}
-		})
-		.then(function(device){
-			index=0
-			if(device){
-				dataItems[index].title = web3.toAscii(device[0]);
-				dataItems[index].model = web3.toAscii(device[1]);
-				dataItems[index].description = web3.toAscii(device[2]);
-				dataItems[index].isLocked=device[3];
-			}
-			callback(dataItems);
-		})
-		.catch(function(e){
-			console.log(e);
-		});	
+			return Promise.all(promises).then(function(dataList){
+				var index = 0;
+				dataList.forEach(function(data){
+					deviceList[index].title=web3.toAscii(data[0]);
+					deviceList[index].model=web3.toAscii(data[1]);
+					deviceList[index].description=web3.toAscii(data[2]);
+					deviceList[index].isLocked=data[3];
+					index++;
+				});
 
-		//accessList = accessContract.GetTokensFor(account);
-		//for(i=0; i < accessList.length; i++){
-		//	var lockContract = LockAPI.deployed();
-		//	lockContract.lockAttrs(accessList[i]);
-		//}
-		//callback(accessList);
-
-		//accessContract.GetTokensFor(account)
-		//.then(function(result){
-		//	callback(result);
-		//})
-		//.catch(function(e){
-		//	console.log(e);
-		//});
-
+			})
+			.then(function(){
+				callback(deviceList);
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		});
+		
 	};
 
 	///////////////////////////////////////////////////////////////////////////
