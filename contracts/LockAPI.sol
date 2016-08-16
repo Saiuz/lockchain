@@ -27,9 +27,10 @@ contract LockAPIBase is Disposable{
 contract LockAPI is LockAPIBase(){
     
     struct identityAttributes{
+        bytes32 title;
         bytes32 model;
         bytes32 description;
-        bool isLocked;
+        bool    isLocked;
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -54,9 +55,9 @@ contract LockAPI is LockAPIBase(){
     
     function LockAPI(PolicyDecisionBase pdp) LockAPIBase(pdp){}
     
-    function Register(address identity, bytes32 model, bytes32 description, bool isLocked) returns(bool result){
+    function Register(address identity, bytes32 title, bytes32 model, bytes32 description, bool isLocked) returns(bool result){
         
-        identityAttributes memory newIdentity = identityAttributes(model,description,isLocked);
+        identityAttributes memory newIdentity = identityAttributes(title,model,description,isLocked);
         lockAttrs[identity] = newIdentity;
         lockOwner[identity] = msg.sender;
         ownerLock[msg.sender].push(identity);

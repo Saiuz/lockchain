@@ -55,9 +55,10 @@ angular.module("LockChain").factory("LockFactory", function(){
 		.then(function(device){
 			index=0
 			if(device){
-				dataItems[index].model = web3.toAscii(device[0]);
-				dataItems[index].description = web3.toAscii(device[1]);
-				dataItems[index].isLocked=device[2];
+				dataItems[index].title = web3.toAscii(device[0]);
+				dataItems[index].model = web3.toAscii(device[1]);
+				dataItems[index].description = web3.toAscii(device[2]);
+				dataItems[index].isLocked=device[3];
 			}
 			callback(dataItems);
 		})
