@@ -46920,7 +46920,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[AccessToken,LockAPI,Disposable,LockAPIBase,LogService,PolicyDecision,Migrations,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -47377,7 +47377,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 	};
 
 	$scope.eventStatus = $scope.watchStatus.NotWatching;
-	$scope.eventLog = getEventLog();
+	//$scope.eventLog = getEventLog();
 	//$scope.transactionLog = getTransactionLog();
 	var eventWatcher;
 
@@ -47502,14 +47502,17 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	$scope.defaultAccount = AccountFactory.getDefaultAccount();
 	$scope.selectedAccount = $scope.defaultAccount;
 	$scope.household=[];
-	loadDataforAccount($scope.selectedAccount);
+	getRegisteredForAccount($scope.selectedAccount);
 		
 	///////////////////////////////////////////////////////////////////////
 	// Load Data For Selected Account
 	///////////////////////////////////////////////////////////////////////
-	function loadDataforAccount(account){
-		var lockAPIContract = LockAPI.deployed();
-		var identityContract = IdentityStore.deployed();
+	function getRegisteredForAccount(account){
+		LockFactory.getRegisteredForAccount(account, function(result){
+			$scope.$apply(function(){
+				$scope.household=result;
+			});
+		});
 	}
 
 
@@ -47531,7 +47534,7 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Reload Data For New Selected Account
 	///////////////////////////////////////////////////////////////////////
 	$scope.selectedAccountChanged = function(){
-		loadDataforAccount($scope.selectedAccount);
+		getRegisteredForAccount($scope.selectedAccount);
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -47553,7 +47556,6 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	function lock(index){
 		LockFactory.lock($scope.selectedAccount,$scope.household[index].Id, function(result){
 			$scope.$apply(function(){
-				console.log("TransactionId " + result);
 				$scope.household[index].Locked = true;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].Locked);		
 			});
@@ -47567,60 +47569,12 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	function unlock(index){
 		LockFactory.unlock($scope.selectedAccount,$scope.household[index].Id, function(result){
 			$scope.$apply(function(){
-				console.log("TransactionId " + result);
 				$scope.household[index].Locked = false;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].Locked);
 			});
 		});
 	};
 
-	/*$scope.sendIt = function(){
-		var contract = test.deployed();
-		console.log($scope.ValueToSend);
-		return contract.setData($scope.ValueToSend, {from: ConfigFactory.getDefaultAccount()}).then(function(transactionId){
-			console.log(transactionId);	
-		});
-	}
-	$scope.getItBack = function(){
-		var contract = test.deployed();
-		return contract.getData.call(ConfigFactory.getDefaultAccount()).then(function(data) {
-        	$scope.$apply(function(){
-        		$scope.ValueSet = web3.toAscii(data);
-        	});
-    	});
-	}
-
-	$scope.getTupleBack = function(){
-		var contract = test.deployed();
-		return contract.getTuple.call(ConfigFactory.getDefaultAccount()).then(function(data) {
-        	$scope.$apply(function(){
-        		console.log(data);
-        	});
-    	});
-	}
-
-	$scope.register = function(account, address){
-		DeviceFactory.register(account,address,function(response){
-			if(response){
-				console.log("TXN = " + response)			
-			}
-			else{
-				$scope.errorMessage=ErrorMessages.ErrorRegistrationMessage;
-			}
-		})
-	};
-
-	$scope.unregister = function(account, address){
-		DeviceFactory.unregister(account,address,function(response){
-			if(response){
-				console.log("TXN = " + response)			
-			}
-			else{
-				$scope.errorMessage=ErrorMessages.ErrorUnRegistrationMessage;
-			}
-		})
-	};
-	*/
 	
 }]);
 
@@ -47893,6 +47847,9 @@ angular.module("LockChain").factory("RegisterFactory", function(){
 angular.module("LockChain").factory("LockFactory", function(){
 
 
+	var lockContract = LockAPI.deployed();
+	var accessContract = TokenIssuer.deployed();
+
 	///////////////////////////////////////////////////////////////////////////
 	// Function Pointer Register
 	// Locks the Specified Resource by posting a trnsaction on the blockchain
@@ -47903,8 +47860,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var register = function(account, resource, callback){
-		var contract = LockAPI.deployed();
-		contract.Register(resource.address, resource.model, resource.description, resource.isLocked, {from:account})
+		lockContract.Register(resource.address, resource.model, resource.description, resource.isLocked, {from:account})
 		.then(function(result){
 			callback(result);
 		})
@@ -47914,8 +47870,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	};
 
 	var transfer = function(account, resource, newOwner, callback){
-		var contract = LockAPI.deployed();
-		contract.Transfer(resource.address, newOwner, {from:account})
+		lockContract.Transfer(resource.address, newOwner, {from:account})
 		.then(function(result){
 			callback(result);
 		})
@@ -47924,7 +47879,43 @@ angular.module("LockChain").factory("LockFactory", function(){
 		});
 	};
 
-	var getRegistered = function(){
+	var getRegisteredForAccount = function(account, callback){
+
+		var dataItems=[];
+		accessContract.GetTokensFor(account)
+		.then(function(result){
+			for(i=0; i<result.length; i++){
+				dataItems.push({address:result[i]});
+				return lockContract.lockAttrs(result[i])
+			}
+		})
+		.then(function(device){
+			index=0
+			if(device){
+				dataItems[index].model = web3.toAscii(device[0]);
+				dataItems[index].description = web3.toAscii(device[1]);
+				dataItems[index].isLocked=device[2];
+			}
+			callback(dataItems);
+		})
+		.catch(function(e){
+			console.log(e);
+		});	
+
+		//accessList = accessContract.GetTokensFor(account);
+		//for(i=0; i < accessList.length; i++){
+		//	var lockContract = LockAPI.deployed();
+		//	lockContract.lockAttrs(accessList[i]);
+		//}
+		//callback(accessList);
+
+		//accessContract.GetTokensFor(account)
+		//.then(function(result){
+		//	callback(result);
+		//})
+		//.catch(function(e){
+		//	console.log(e);
+		//});
 
 	};
 
@@ -47938,8 +47929,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var lock = function(account, resource, callback){
-		var contract = LockAPI.deployed();
-		contract.Lock(resource, {from:account})
+		lockContract.Lock(resource, {from:account})
 		.then(function(response){
 			callback(response);
 		})
@@ -47958,8 +47948,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var unlock = function(account, resource, callback){
-		var contract = LockAPI.deployed();
-		contract.Unlock(resource,{from:account})
+		lockContract.Unlock(resource,{from:account})
 		.then(function(response){
 			callback(response);
 		})
@@ -47971,7 +47960,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	return{
 		register:register,
 		transfer:transfer,
-		getRegistered:getRegistered,
+		getRegisteredForAccount:getRegisteredForAccount,
 		lock: lock,
 		unlock:unlock
 	};

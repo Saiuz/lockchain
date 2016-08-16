@@ -10,6 +10,9 @@
 angular.module("LockChain").factory("LockFactory", function(){
 
 
+	var lockContract = LockAPI.deployed();
+	var accessContract = TokenIssuer.deployed();
+
 	///////////////////////////////////////////////////////////////////////////
 	// Function Pointer Register
 	// Locks the Specified Resource by posting a trnsaction on the blockchain
@@ -20,8 +23,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var register = function(account, resource, callback){
-		var contract = LockAPI.deployed();
-		contract.Register(resource.address, resource.model, resource.description, resource.isLocked, {from:account})
+		lockContract.Register(resource.address, resource.model, resource.description, resource.isLocked, {from:account})
 		.then(function(result){
 			callback(result);
 		})
@@ -31,8 +33,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	};
 
 	var transfer = function(account, resource, newOwner, callback){
-		var contract = LockAPI.deployed();
-		contract.Transfer(resource.address, newOwner, {from:account})
+		lockContract.Transfer(resource.address, newOwner, {from:account})
 		.then(function(result){
 			callback(result);
 		})
@@ -41,7 +42,43 @@ angular.module("LockChain").factory("LockFactory", function(){
 		});
 	};
 
-	var getRegistered = function(){
+	var getRegisteredForAccount = function(account, callback){
+
+		var dataItems=[];
+		accessContract.GetTokensFor(account)
+		.then(function(result){
+			for(i=0; i<result.length; i++){
+				dataItems.push({address:result[i]});
+				return lockContract.lockAttrs(result[i])
+			}
+		})
+		.then(function(device){
+			index=0
+			if(device){
+				dataItems[index].model = web3.toAscii(device[0]);
+				dataItems[index].description = web3.toAscii(device[1]);
+				dataItems[index].isLocked=device[2];
+			}
+			callback(dataItems);
+		})
+		.catch(function(e){
+			console.log(e);
+		});	
+
+		//accessList = accessContract.GetTokensFor(account);
+		//for(i=0; i < accessList.length; i++){
+		//	var lockContract = LockAPI.deployed();
+		//	lockContract.lockAttrs(accessList[i]);
+		//}
+		//callback(accessList);
+
+		//accessContract.GetTokensFor(account)
+		//.then(function(result){
+		//	callback(result);
+		//})
+		//.catch(function(e){
+		//	console.log(e);
+		//});
 
 	};
 
@@ -55,8 +92,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var lock = function(account, resource, callback){
-		var contract = LockAPI.deployed();
-		contract.Lock(resource, {from:account})
+		lockContract.Lock(resource, {from:account})
 		.then(function(response){
 			callback(response);
 		})
@@ -75,8 +111,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var unlock = function(account, resource, callback){
-		var contract = LockAPI.deployed();
-		contract.Unlock(resource,{from:account})
+		lockContract.Unlock(resource,{from:account})
 		.then(function(response){
 			callback(response);
 		})
@@ -88,7 +123,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	return{
 		register:register,
 		transfer:transfer,
-		getRegistered:getRegistered,
+		getRegisteredForAccount:getRegisteredForAccount,
 		lock: lock,
 		unlock:unlock
 	};

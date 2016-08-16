@@ -31,20 +31,21 @@
   
   <div class="row panel panel-default" ng-Hide="household.length==0">
     <div class="col-sm-6 col-md-4 col-lg-4" ng-repeat= "device in household">
-      <h2>{{device.Location}}</h2>
-      <p>{{device.Description}}</p>
-      <p>{{device.Address}}</p>
+      <h2>{{device.title}}</h2>
+      <p>{{device.description}}</p>
+      <p>{{device.model}}</p>
+      <p>{{device.address}}</p>
       <p>
-        <img width=10% ng-src="{{device.Locked?'images/locked.png':'images/unlocked.png'}}"/>{{device.Locked ? " Locked" : " Unlocked"}}
+        <img width=10% ng-src="{{device.isLocked?'images/locked.png':'images/unlocked.png'}}"/>{{device.Locked ? " Locked" : " Unlocked"}}
       </p>
-      <button ng-click="toggleLock($index)" class="btn btn-default">{{device.Locked ? "Unlock" : "Lock"}}</button>
+      <button ng-click="toggleLock($index)" class="btn btn-default">{{device.isLocked ? "Unlock" : "Lock"}}</button>
       <a class="btn btn-default" href="#/details" role="button">Details</a>
       <a class="btn btn-default" href="#/access" role="button">Access</a>
     </div>
   </div>
   
   <div class="row panel panel-default" ng-Show="household.length==0">
-    <div class="col-sm-12 text-center">
+    <div class="col-sm-12">
       <h2>No Devices Registered To This Address</h2>
     </div>
   </div>

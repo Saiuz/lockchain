@@ -17,14 +17,17 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	$scope.defaultAccount = AccountFactory.getDefaultAccount();
 	$scope.selectedAccount = $scope.defaultAccount;
 	$scope.household=[];
-	loadDataforAccount($scope.selectedAccount);
+	getRegisteredForAccount($scope.selectedAccount);
 		
 	///////////////////////////////////////////////////////////////////////
 	// Load Data For Selected Account
 	///////////////////////////////////////////////////////////////////////
-	function loadDataforAccount(account){
-		var lockAPIContract = LockAPI.deployed();
-		var identityContract = IdentityStore.deployed();
+	function getRegisteredForAccount(account){
+		LockFactory.getRegisteredForAccount(account, function(result){
+			$scope.$apply(function(){
+				$scope.household=result;
+			});
+		});
 	}
 
 
@@ -46,7 +49,7 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Reload Data For New Selected Account
 	///////////////////////////////////////////////////////////////////////
 	$scope.selectedAccountChanged = function(){
-		loadDataforAccount($scope.selectedAccount);
+		getRegisteredForAccount($scope.selectedAccount);
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -68,7 +71,6 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	function lock(index){
 		LockFactory.lock($scope.selectedAccount,$scope.household[index].Id, function(result){
 			$scope.$apply(function(){
-				console.log("TransactionId " + result);
 				$scope.household[index].Locked = true;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].Locked);		
 			});
@@ -82,59 +84,11 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	function unlock(index){
 		LockFactory.unlock($scope.selectedAccount,$scope.household[index].Id, function(result){
 			$scope.$apply(function(){
-				console.log("TransactionId " + result);
 				$scope.household[index].Locked = false;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].Locked);
 			});
 		});
 	};
 
-	/*$scope.sendIt = function(){
-		var contract = test.deployed();
-		console.log($scope.ValueToSend);
-		return contract.setData($scope.ValueToSend, {from: ConfigFactory.getDefaultAccount()}).then(function(transactionId){
-			console.log(transactionId);	
-		});
-	}
-	$scope.getItBack = function(){
-		var contract = test.deployed();
-		return contract.getData.call(ConfigFactory.getDefaultAccount()).then(function(data) {
-        	$scope.$apply(function(){
-        		$scope.ValueSet = web3.toAscii(data);
-        	});
-    	});
-	}
-
-	$scope.getTupleBack = function(){
-		var contract = test.deployed();
-		return contract.getTuple.call(ConfigFactory.getDefaultAccount()).then(function(data) {
-        	$scope.$apply(function(){
-        		console.log(data);
-        	});
-    	});
-	}
-
-	$scope.register = function(account, address){
-		DeviceFactory.register(account,address,function(response){
-			if(response){
-				console.log("TXN = " + response)			
-			}
-			else{
-				$scope.errorMessage=ErrorMessages.ErrorRegistrationMessage;
-			}
-		})
-	};
-
-	$scope.unregister = function(account, address){
-		DeviceFactory.unregister(account,address,function(response){
-			if(response){
-				console.log("TXN = " + response)			
-			}
-			else{
-				$scope.errorMessage=ErrorMessages.ErrorUnRegistrationMessage;
-			}
-		})
-	};
-	*/
 	
 }]);

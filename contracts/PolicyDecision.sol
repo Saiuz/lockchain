@@ -18,7 +18,7 @@ contract PolicyDecisionBase is Disposable{
         result = true;
     }
     
-    function getIssuer() returns (TokenIssuer accessIssuer){
+    function getIssuer() constant returns (TokenIssuer accessIssuer){
         accessIssuer = issuer;
     }
     
@@ -27,7 +27,7 @@ contract PolicyDecisionBase is Disposable{
         result = true;
     }
     
-    function getLogger() returns (LogService logService){
+    function getLogger() constant returns (LogService logService){
         logService = logger;
     }
     
