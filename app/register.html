@@ -1,0 +1,61 @@
+<div class="jumbotron"> 
+</div>  
+<div class="container panel panel-default">  		
+	<h1>New Device</h1>
+	<div class="row">
+		<div class="col-sm-7">
+			<h2>Device Description</h2>
+			<div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <td><strong>Name</strong></td>
+                  <td><strong>Value</strong></td> 
+                  <td><strong>Active</strong></td>    
+                </thead>
+                <tbody>
+                  <tr ng-repeat="attribute in attributes">
+                    <td>{{attribute.name}}</td>
+                    <td>{{attribute.value}}</td>
+                    <td>{{attribute.active}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>  
+		</div>
+		<div class="col-sm-1">
+		</div>
+		<div class="col-sm-4">
+			<h2>Add Description</h2>
+			<label for="name">Attribute Name <small>(required)</small></label>
+			<input ng-model="newAttribute.name" type="text" id="name" name="name" placeholder="*Name" class="form-control" maxlength="32">
+			<p>
+			
+			<label for="value">Value <small>(required)</small></label>
+			<input ng-model="newAttribute.value" type="text" id="value" name="value" placeholder="*Value" class="form-control" maxlength="32">
+			<p>
+			<div class="row">
+				<div class="col-sm-12">
+					<button ng-click="addAttribute()" class="btn btn-default pull-right">Add</button>
+				</div>
+			</div>
+		</div>		
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<button class="btn btn-success pull-right" ng-click="register()" role="button">Register</button>
+        </div>
+	</div>
+</div>   
+
+<div class="container panel panel-default">  
+	<h1>Access Policy</h1>
+	<div class="row">
+		<div class="col-sm-12">			
+			<label for="value">Grant Access To</label>
+			<select id="selectedAccount" class="form-control" ng-model="selectedAccount" 
+                ng-options="account for account in accounts" 
+                ng-change="selectedAccountChanged()">
+        	</select> 
+		</div>
+	</div>
+</div>

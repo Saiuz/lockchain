@@ -1,0 +1,126 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="MSc Dissertation">
+    <meta name="author" content="Andrew Hall">
+    <link rel="icon" href="images/favicon.png">
+
+    <title>LD042 Dissertation Prototype</title>
+
+    <!-- Bootstrap core CSS  Incorprated Ti app.css through build process-->
+    <link href="./app.css" rel="stylesheet" type="text/css">
+
+    <!-- JQuery, BootStrap AngularJS Incorprated into app.js through build process-->
+    <script src="./app.js"></script>
+  </head>
+  
+  <body data-ng-app="LockChain">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">LD042 Dissertation Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+    <!-- Placeholder for Dynamic Views -->
+    <div ng-view></div>
+
+
+    <div class="container panel panel-default" ng-controller="EventController">
+      <div class="row">
+        <div class="col-sm-8">
+          <h2>Blockchain Viewer</h2>
+        </div>
+        <div class="col-sm-4">
+          <p>&nbsp;</p>
+          <button class="btn btn-success pull-right" ng-click="toggleEventTrace()" role="button">{{eventStatus == watchStatus.NotWatching ? "Start Watching" : "Stop Watching"}}</button> 
+        </div>
+      </div>
+      <!-- TABLE FOR NEW RECEIVED EVENTS WARCHING ACTIVE--> 
+      <div class="row">
+        <div class="col-sm-12">
+          <p><label id="eventStatus" name="eventStatus">{{eventStatus}}</label></p>
+          <div class="table-responsive">
+              <table class="table" ng-Show="event!=null">
+                <thead>
+                  <td><strong>Block Number</strong></td>
+                  <td><strong>Source</strong></td>
+                  <td><strong>Description</strong></td> 
+                  <td><strong>From</strong></td> 
+                  <td><strong>Resource</strong></td>     
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{event.blockNumber}}</td>
+                    <td>{{event.event}}</td>
+                    <td>{{toAscii(event.args.message)}}</td>
+                    <td>{{event.args.by}}</td>
+                    <td>{{event.args.resource}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>  
+        </div>
+      </div>
+      <!-- TABLE FOR EVENT LOG HISTORY -->        
+      <div class="row">
+        <div class="col-sm-12" ng-Show="eventLog.length > 0">
+            <p><label id="Contract Events" name="Contract Events">Contract Events</label></p>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <td><strong>Block Number</strong></td>
+                  <td><strong>Source</strong></td>
+                  <td><strong>Description</strong></td> 
+                  <td><strong>From</strong></td> 
+                  <td><strong>Resource</strong></td>     
+                </thead>
+                <tbody>
+                  <tr ng-repeat="event in eventLog | orderBy:'event.blockNumber':true">
+                    <td>{{event.blockNumber}}</td>
+                    <td>{{event.event}}</td>
+                    <td>{{toAscii(event.args.message)}}</td>
+                    <td>{{event.args.by}}</td>
+                    <td>{{event.args.resource}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>  
+        </div>
+      </div>  
+    
+    </div>  
+
+    <footer>
+      <div class="row">
+        <div class="col-sm-12 text-center"> 
+          <br><p class="text-center">&copy; Andrew Hall 2016</p></br>
+        </div>
+      </div>    
+    </footer>
+  <body>
+</html>

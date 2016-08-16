@@ -1,0 +1,52 @@
+<div class="jumbotron">
+  <div class="container">
+    <h2>Welcome to Lockchain</h2>
+    <p>This project is a demonstration proof of concept designed to evaluate how blockchain technology could be used to provide an identity and access management framwork for internet of things applications. This demonstration is based on a smart homes use case illustrating how remote locking and unlocking could be achieved and how these rights might be granted to different people or applications</p>
+  </div>
+</div>
+
+
+
+
+<div class="container">
+  <div class="row panel panel-default">
+    <div class="col-sm-6">
+        <h1>Your Household</h1>
+    </div>
+    <div class="col-sm-6">
+        <div class="row" style="margin-right:0">
+          <label for selectedAccount style=" margin-top: 1em;">Select Account - {{accounts.length}} Account(s) Found</label>
+          <select id="selectedAccount" class="form-control" ng-model="selectedAccount" 
+                  ng-options="account for account in accounts" 
+                  ng-change="selectedAccountChanged()">
+          </select> 
+        </div>
+        <div class="row text-right" style="margin-right:0">
+          <p>&nbsp;</p>
+          <a class="btn btn-success" href="#/register/{{selectedAccount}}" role="button">Register a New Device</a>
+          <p>&nbsp;</p>
+        </div>
+    </div>
+  </div>
+  
+  <div class="row panel panel-default" ng-Hide="household.length==0">
+    <div class="col-sm-6 col-md-4 col-lg-4" ng-repeat= "device in household">
+      <h2>{{device.Location}}</h2>
+      <p>{{device.Description}}</p>
+      <p>{{device.Address}}</p>
+      <p>
+        <img width=10% ng-src="{{device.Locked?'images/locked.png':'images/unlocked.png'}}"/>{{device.Locked ? " Locked" : " Unlocked"}}
+      </p>
+      <button ng-click="toggleLock($index)" class="btn btn-default">{{device.Locked ? "Unlock" : "Lock"}}</button>
+      <a class="btn btn-default" href="#/details" role="button">Details</a>
+      <a class="btn btn-default" href="#/access" role="button">Access</a>
+    </div>
+  </div>
+  
+  <div class="row panel panel-default" ng-Show="household.length==0">
+    <div class="col-sm-12 text-center">
+      <h2>No Devices Registered To This Address</h2>
+    </div>
+  </div>
+
+</div>      
