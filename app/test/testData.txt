@@ -38,3 +38,9 @@ PAST	:	1429092000
 "0xbe2a72105fa44cc9d9826a4e6e33fccc1fc8ac26","0x913feb633f74299453d651f2d27ce08335b91862",0,0
 
 "0x8d7e5dd6bf11fc95f74d6d322e31065bd1b17af4","0x24cb018a9c32c38c7e3fe436f0e5d4951463eb1b",1429092000,1523786400
+
+"TESR","0x24cb018a9c32c38c7e3fe436f0e5d4951463eb1b","0xca35b7d915458ef540ade6068dfe2f44e8fa733c"
+
+var lg = LogService.deployed();
+var logEvent = lg.AccessGranted({}, {fromBlock: 0, toBlock: 'latest'});
+logEvent.watch(function(error, result){console.log(result);});

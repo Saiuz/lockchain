@@ -19,6 +19,7 @@ module.exports = {
          "js/vendor/angular.min.js",
          "js/vendor/angular-route.min.js",
          "js/vendor/bootstrap.min.js",
+         "js/vendor/date.js",
          "js/app.js",
          "js/controllers/accountcontroller.js",
          "js/controllers/eventcontroller.js",
@@ -26,9 +27,8 @@ module.exports = {
          "js/controllers/registercontroller.js",
          "js/factories/accountfactory.js",
          "js/factories/eventfactory.js",
-         "js/factories/registerfactory.js",
-         "js/factories/lockfactory.js",
-         "js/factories/identityfactory.js"
+         "js/factories/policyfactory.js",
+         "js/factories/lockfactory.js"
          
     ],
 

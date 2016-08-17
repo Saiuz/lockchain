@@ -6,63 +6,54 @@
 // Andrew Hall 2016
 ///////////////////////////////////////////////////////////////////////////////
 
-angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","RegisterFactory", "AccountFactory", "IdentityFactory", function($scope,$routeParams,RegisterFactory,AccountFactory, IdentityFactory){
+angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","LockFactory", "AccountFactory", "PolicyFactory", function($scope,$routeParams,LockFactory,AccountFactory,PolicyFactory){
 
 	console.log("Entered RegisterController");
 	$scope.accounts = AccountFactory.getAccounts();
 	$scope.defaultAccount = AccountFactory.getDefaultAccount();
 	$scope.selectedAccount=$routeParams.accountId;
+	$scope.device={};
+	$scope.device.permissions=[];
 	initialise();
 
+	///////////////////////////////////////////////////////////////////////////
+	// Function Initialise
+	///////////////////////////////////////////////////////////////////////////
+	// Set Up The Initial View For The Page. Create Empty Data Structures
+	// Populated With Sensible Defaults
+	///////////////////////////////////////////////////////////////////////////
 	function initialise(){
-		$scope.attributes = [];
-		$scope.attributes.push({name:"Device",value:"0x94f683fe1e5cc9a1b24143b2f8b6b989b017a368",readOnly:true});
-		$scope.attributes.push({name:"Owner",value:$scope.selectedAccount,readOnly:true});
-		$scope.attributes.push({name:"Description",value:"Smart Lock",readOnly:true});
-		$scope.attributes.push({name:"Model",value:"TX14596V2",readOnly:true});
-		$scope.attributes.push({name:"Manufacturer",value:"Samsung",readOnly:true});
+		$scope.device.address="0x4c9426da3ca8278501ef3bcc86d88ed68e08738c";
+		$scope.device.title="";
+		$scope.device.model="";
+		$scope.device.description="";
+		$scope.device.isLocked=true;
+
+		for(i=0; i < $scope.accounts.length; i++){
+			var grantFor = (scope.accounts[i]==$scope.selectedAccount)
+			var permission = {name:$scope.accounts[i],startDate:"",endDate:"", grant:grantFor};
+			$scope.device.permissions[i] = permission;					
+		}
+
 	}
 
-
-	//$scope.register = function(){
-	//	
-	//	RegisterFactory.register($scope.selectedAccount, "0x94f683fe1e5cc9a1b24143b2f8b6b989b017a368" ,true, function(response){
-	//		console.log(response);
-	//	});
-	//}
-
+	///////////////////////////////////////////////////////////////////////////
+	// Function Register
+	///////////////////////////////////////////////////////////////////////////
+	// Registers and new devices and sets the requested permissions on the 
+	// Device as requested. Lock Factorry Register Returns a Blockchain
+	// Transaction Id. SetPolicy returns an array of transaction Ids
+	///////////////////////////////////////////////////////////////////////////
 	$scope.register = function(){
 
-		var keys = []; var values = [];
-		for(i=0; i < $scope.attributes.length; i++){
-			keys.push($scope.attributes[i].name);
-			values.push($scope.attributes[i].value);	
-		}
+		LockFactory.register($scope.selectedAccount,$scope.device,function(result){
+			console.log(result);
+			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device,function(result){
+				console.log(result);
+			});
 
-		IdentityFactory.register($scope.selectedAccount,"0x94f683fe1e5cc9a1b24143b2f8b6b989b017a368", keys, values, function(response){
-			console.log(response);
 		});
-
-		RegisterFactory.register($scope.selectedAccount, "0x94f683fe1e5cc9a1b24143b2f8b6b989b017a368" ,true, function(response){
-			console.log(response);
-		});
-
 	}	
-
-
-	$scope.addAttribute= function(){
-
-		for(i=0; i < $scope.attributes.length; i++){
-			if($scope.newAttribute.name==$scope.attributes[i].name){
-				$scope.attributes[i].value=$scope.newAttribute.value;
-				return;
-			}
-		}
-
-		$scope.attributes.push({name:$scope.newAttribute.name,value:$scope.newAttribute.value,readOnly:true});
-		$scope.newAttribute.name="";
-		$scope.newAttribute.value="";			
-	}
 	
 
 }]);

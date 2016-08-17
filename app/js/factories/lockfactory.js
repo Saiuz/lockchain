@@ -17,7 +17,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Export Register
-	// Locks the Specified Resource by posting a trnsaction on the blockchain
+	// Locks the Specified Resource by posting a transaction on the blockchain
 	///////////////////////////////////////////////////////////////////////////
 	// Parameters
 	// account 	: sender account
@@ -25,7 +25,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var register = function(account, resource, callback){
-		lockContract.Register(resource.address, resource.model, resource.description, resource.isLocked, {from:account})
+		lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account})
 		.then(function(result){
 			callback(result);
 		})
@@ -61,6 +61,7 @@ angular.module("LockChain").factory("LockFactory", function(){
     // Note due to restrictions in return types in Solidity this must be done
     // Object by object. To make this more efficient we chain promises
     // together and execute asynchronously
+    // See https://www.sitepoint.com/deeper-dive-javascript-promises/
 	///////////////////////////////////////////////////////////////////////////
 	// Parameters
 	// account 	: sender account
