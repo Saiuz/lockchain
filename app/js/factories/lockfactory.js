@@ -53,6 +53,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 		});
 	};
 
+
 	///////////////////////////////////////////////////////////////////////////
 	// Function Export getRegisteredForAccount
 	// Returns the resourecs to which the use has some degree of access rights

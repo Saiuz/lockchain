@@ -5,8 +5,7 @@
 // LD042 Advanced Web Engineering
 // Andrew Hall 2016
 ///////////////////////////////////////////////////////////////////////////////
-
-angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","LockFactory", "AccountFactory", "PolicyFactory", function($scope,$routeParams,LockFactory,AccountFactory,PolicyFactory){
+angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","$location", "LockFactory", "AccountFactory", "PolicyFactory", function($scope,$routeParams,$location,LockFactory,AccountFactory,PolicyFactory){
 
 	console.log("Entered RegisterController");
 	$scope.accounts = AccountFactory.getAccounts();
@@ -23,14 +22,15 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	// Populated With Sensible Defaults
 	///////////////////////////////////////////////////////////////////////////
 	function initialise(){
-		$scope.device.address="0x4c9426da3ca8278501ef3bcc86d88ed68e08738c";
+
+		$scope.device.address=AccountFactory.getNextDeviceAddress();
 		$scope.device.title="";
 		$scope.device.model="";
 		$scope.device.description="";
 		$scope.device.isLocked=true;
 
 		for(i=0; i < $scope.accounts.length; i++){
-			var grantFor = (scope.accounts[i]==$scope.selectedAccount)
+			var grantFor = ($scope.accounts[i]==$scope.selectedAccount)
 			var permission = {name:$scope.accounts[i],startDate:"",endDate:"", grant:grantFor};
 			$scope.device.permissions[i] = permission;					
 		}
@@ -50,6 +50,10 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			console.log(result);
 			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device,function(result){
 				console.log(result);
+			}).then(function(){
+				$scope.$apply(function(){
+					$location.path("/");
+				});
 			});
 
 		});
