@@ -31,7 +31,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		
 		promises=[];
 
-		for(i=0;i < resource.permissions.length-1; i++){
+		for(i=0;i < resource.permissions.length; i++){
 			var item = resource.permissions[i];
 			
 			if(item.grant){

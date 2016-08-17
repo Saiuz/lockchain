@@ -57,6 +57,15 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			});
 
 		});
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// Function GrantToUser
+	///////////////////////////////////////////////////////////////////////////
+	// Update the Model When The User Chooses to Gtant Permissions
+	///////////////////////////////////////////////////////////////////////////
+	$scope.grantToUser = function (index){
+		$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
 	}	
 	
 

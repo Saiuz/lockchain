@@ -3,7 +3,7 @@
 <div class="container panel panel-default">  		
 	<h1>New Device</h1>
 	<div class="row">
-		<div class="col-sm-4">
+		<div class="col-sm-3">
 			<h2>Add Description</h2>
 			
 			<label for="address">Address <small>(required)</small></label>
@@ -28,7 +28,7 @@
 		</div>		
 		<div class="col-sm-1">
 		</div>
-		<div class="col-sm-7">
+		<div class="col-sm-8">
 			<h2>Grant Access To</h2>
 			<div class="table-responsive">
               <table class="table">
@@ -36,12 +36,14 @@
                   <td><strong>Name</strong></td>
                   <td><strong>Start Date</strong></td>
                   <td><strong>End Date</strong></td>
+                  <td><strong></strong></td>
                 </thead>
                 <tbody>
                   <tr ng-repeat="grant in device.permissions">
                     <td>{{grant.name}}</td>
                     <td>{{grant.startDate}}</td>
                     <td>{{grant.endDate}}</td>
+                    <td><button class="{{grant.grant ? 'btn btn-warning btn-block' : 'btn btn-primary btn-block'}}" ng-click="grantToUser($index)" role="button">{{grant.grant ? "Revoke" : "Grant"}}</button></td>
                   </tr>
                 </tbody>
               </table>
