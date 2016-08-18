@@ -70,8 +70,8 @@
                 <tbody>
                   <tr ng-repeat="grant in device.permissions">
                     <td>{{grant.name}}</td>
-                    <td><input type="date" ng-model="grant.startDate" class="form-control"/></td>
-                    <td><input type="date" ng-model="grant.endDate" class="form-control"/></td>
+                    <td><input type="date" ng-model="grant.startDate" value="{{grant.startDateString}}" class="form-control"/></td>
+                    <td><input type="date" ng-model="grant.endDate" value="{{grant.endDateString}}"class="form-control"/></td>
                     <td><button class="{{grant.grant ? 'btn btn-warning btn-block' : 'btn btn-primary btn-block'}}" ng-click="grantToUser($index)" role="button">{{grant.grant ? "Revoke" : "Grant"}}</button></td>
                   </tr>
                 </tbody>

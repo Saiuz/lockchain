@@ -9,25 +9,6 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	
 	var tokenContract = TokenIssuer.deployed();
 
-	var setPolicyA = function(account, resource, callback){
-
-		for(i=0;i < resource.permissions.length; i++){
-			var item = resource.permissions[i];
-			
-			if(item.grant){
-				var startDate = 0; var endDate = 0;
-				if(item.startDate != 0){
-					startDate = (item.startDate.getTime()/1000).toFixed(0);
-				}
-				if(item.endDate != 0){
-					endDate = (item.endDate.getTime()/1000).toFixed(0);
-				}
-				tokenContract.Grant(item.name, resource.address, startDate, endDate,{from:account});
-			}
-		}
-		callback(true);
-	};
-
 	///////////////////////////////////////////////////////////////////////////
 	// GetPolicy
 	///////////////////////////////////////////////////////////////////////////
@@ -50,8 +31,21 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 					dataList.forEach(function(data){
 						policyList[index].issuedTo=data[0];
 						policyList[index].issuedFor=data[1];
-						policyList[index].startDate=Date(data[2]);
-						policyList[index].endDate=Date(data[3]);
+						policyList[index].startDateString="";
+						policyList[index].endDateString="";
+						policyList[index].startDate=0;
+						policyList[index].endDate=0;;
+
+						if(data[2] > 0){
+							startDate = new Date(data[2]*1000);
+							policyList[index].startDate=startDate;
+							policyList[index].startDateString=startDate.toString("yyyy-MM-dd");
+						}
+						if(data[3] > 0){
+							endDate = new Date(data[3]*1000);
+							policyList[index].endDate=endDate;
+							policyList[index].endDateString=endDate.toString("yyyy-MM-dd");
+						}
 						index++;
 					});
 
@@ -116,11 +110,12 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		for(i=0;i < resource.permissions.length; i++){
 			var item = resource.permissions[i];
 			if(item.grant){
-				var startDate = 0; var endDate = 0;
-				if(item.startDate != 0){
+				var startDate = (item.startDate == null ? 0 : item.startDate);
+				var endDate = (item.endDate == null ? 0 : item.endDate);
+				if(startDate != 0){
 					startDate = (item.startDate.getTime()/1000).toFixed(0);
 				}
-				if(item.endDate != 0){
+				if(endDate != 0){
 					endDate = (item.endDate.getTime()/1000).toFixed(0);
 				}
 				promises.push(tokenContract.Grant(item.name, resource.address, startDate, endDate,{from:account}));

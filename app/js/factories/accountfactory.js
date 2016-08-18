@@ -69,7 +69,6 @@ angular.module("LockChain").factory("AccountFactory", function(){
 	};
 
 
-
 	///////////////////////////////////////////////////////////////////////////
 	// Function getNextDeviceAddress
 	///////////////////////////////////////////////////////////////////////////
@@ -81,6 +80,14 @@ angular.module("LockChain").factory("AccountFactory", function(){
 		return generateDummyAddress();
 	};
 
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Function generateDummyAddress
+	///////////////////////////////////////////////////////////////////////////
+	// Generate a fake address for devices as bytes40. In the real
+	// world we assume that devices will be preregistered and 
+	// already have addresses allocated by the manufacturer
+	///////////////////////////////////////////////////////////////////////////
 	function generateDummyAddress(){
 		var x=(Math.random()*100000000000000000).toString();
 		var y=(Math.random()*100000000000000000).toString();
