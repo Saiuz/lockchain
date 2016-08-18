@@ -4,6 +4,7 @@ import "./PolicyDecision.sol";
 contract LockAPIBase is Disposable{
     
     PolicyDecisionBase policyDecisionPoint;
+    LogService logger;
     
     ////////////////////////////////////////////////////////////////////////////
     // Policy Enforcement Points
@@ -13,8 +14,9 @@ contract LockAPIBase is Disposable{
        if(!isAuthorised) { return; } _
     }
     
-    function LockAPIBase(PolicyDecisionBase pdp){
+    function LockAPIBase(PolicyDecisionBase pdp, LogService eventLogger){
         policyDecisionPoint = pdp;
+        logger = eventLogger;
     }
     
     function setPolicyDecisionPoint(PolicyDecisionBase pdp) returns (bool result){
@@ -24,6 +26,15 @@ contract LockAPIBase is Disposable{
 
     function getPolicyDecisionPoint() returns (PolicyDecisionBase result){
         result = policyDecisionPoint;
+    }
+
+    function setLogger(LogService eventLogger) returns (bool result){
+        logger = eventLogger;  
+        result = true;
+    }
+
+    function getLogger() returns (LogService result){
+        result = logger;
     }    
     
 }
@@ -58,7 +69,7 @@ contract LockAPI is LockAPIBase(){
     mapping(address=>uint) public ownerLockCount;
 
 
-    function LockAPI(PolicyDecisionBase pdp) LockAPIBase(pdp){}
+    function LockAPI(PolicyDecisionBase pdp, LogService logger) LockAPIBase(pdp,logger){}
     
     function Register(address identity, bytes32 title, bytes32 model, bytes32 description, bool isLocked) returns(bool result){
         
@@ -102,12 +113,14 @@ contract LockAPI is LockAPIBase(){
     function Lock(address resource) requireAuthorisation(msg.sender, resource) returns (bool result){
         identityAttributes storage record = lockAttrs[resource];
         record.isLocked=true;
+        logger.LogLocked("LockAPI",msg.sender,resource,"Locked Successfully");
         result=true;
     }
     
     function Unlock(address resource) requireAuthorisation(msg.sender, resource) returns (bool result){
         identityAttributes storage record = lockAttrs[resource];
         record.isLocked=false;
+        logger.LogUnlocked("LockAPI",msg.sender,resource,"Unlocked Successfully");
         result = true;
     }
     

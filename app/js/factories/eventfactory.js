@@ -14,6 +14,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 
 	var lockAPIContract = LockAPI.deployed();
 	var logServiceContract = LogService.deployed();
+	var eventWatcher;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Event Registration
@@ -21,7 +22,6 @@ angular.module("LockChain").factory("EventFactory", function(){
 	// Returns the event instance
 	///////////////////////////////////////////////////////////////////////////
 	var registerForEvents = function(filterOptions){
-		var logServiceContract = LogService.deployed();
 		var eventWatcher = logServiceContract.allEvents({},filterOptions);
 		return eventWatcher;	
 	};
@@ -80,7 +80,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 		startWatching:startWatching,
 		stopWatching:stopWatching,
 		getTransactionLog:getTransactionLog,
-		getEventLog:getEventLog
+		getEventLog:getEventLog,
 
 	};
 });

@@ -11,7 +11,7 @@ module.exports = function(deployer) {
   	}).then(function(){
   		return deployer.deploy(PolicyDecision, TokenIssuer.address, LogService.address);
   	}).then(function(){
-  		return deployer.deploy(LockAPI, PolicyDecision.address);		
+  		return deployer.deploy(LockAPI, PolicyDecision.address,LogService.address);		
   	});
   	
 

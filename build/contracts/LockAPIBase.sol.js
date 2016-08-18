@@ -343,6 +343,23 @@ var Web3 = require("web3");
       },
       {
         "constant": false,
+        "inputs": [
+          {
+            "name": "eventLogger",
+            "type": "address"
+          }
+        ],
+        "name": "setLogger",
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
         "inputs": [],
         "name": "Kill",
         "outputs": [],
@@ -361,17 +378,33 @@ var Web3 = require("web3");
         "type": "function"
       },
       {
+        "constant": false,
+        "inputs": [],
+        "name": "getLogger",
+        "outputs": [
+          {
+            "name": "result",
+            "type": "address"
+          }
+        ],
+        "type": "function"
+      },
+      {
         "inputs": [
           {
             "name": "pdp",
+            "type": "address"
+          },
+          {
+            "name": "eventLogger",
             "type": "address"
           }
         ],
         "type": "constructor"
       }
     ],
-    "unlinked_binary": "0x606060405260405160208060d68339506080604052516000805433600160a060020a0319918216178255600180549091169092179091556093908190604390396000f3606060405260e060020a6000350463197a9b858114602e578063be26733c14605a578063c02c366f146075575b005b6001805473ffffffffffffffffffffffffffffffffffffffff19166004351781555b6060908152602090f35b602c60005433600160a060020a039081169116146085576002565b600154600160a060020a03166050565b600054600160a060020a0316ff",
-    "updated_at": 1471476248349,
+    "unlinked_binary": "0x606060408181528061013d833960a09052516080516000805433600160a060020a03199182161782556001805482169094179093556002805490931690911790915560ee90819061004f90396000f3606060405260e060020a6000350463197a9b85811460425780635722e24a14606e578063be26733c146095578063c02c366f1460b0578063d0b04e391460d0575b005b6001805473ffffffffffffffffffffffffffffffffffffffff19166004351781555b6060908152602090f35b6002805473ffffffffffffffffffffffffffffffffffffffff191660043517905560016064565b604060005433600160a060020a0390811691161460e0576002565b600154600160a060020a03165b600160a060020a03166060908152602090f35b600254600160a060020a031660bd565b600054600160a060020a0316ff",
+    "updated_at": 1471551550732,
     "links": {}
   }
 };
