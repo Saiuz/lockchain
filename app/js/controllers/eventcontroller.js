@@ -19,7 +19,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 	};
 
 	$scope.eventStatus = $scope.watchStatus.NotWatching;
-	//$scope.eventLog = getEventLog();
+	$scope.eventLog = getEventLog();
 	//$scope.transactionLog = getTransactionLog();
 	var eventWatcher;
 

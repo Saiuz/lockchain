@@ -15,10 +15,12 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	$scope.device.permissions=[];
 	if($routeParams.resource){
 		$scope.editMode=true;
+		$scope.pageTitle="1. Edit Device Details";
 		initialisefromData($routeParams.resource);
 	}
 	else{
 		$scope.editMode=false;
+		$scope.pageTitle="1. Add Device Details";
 		initialisefromEmpty();
 	} 
 	

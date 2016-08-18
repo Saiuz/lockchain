@@ -41,21 +41,20 @@ contract PolicyDecision is PolicyDecisionBase(){
     
     function IsAuthorised(address subject, address resource) constant returns (bool result){
         
-        //logger = getLogger();
         var (issuedTo, issuedFor, startDate, endDate) = issuer.GetToken(subject,resource);
         if(issuedTo != subject || issuedFor != resource){
-            logger.LogAccessDenied("PDP",resource,subject);
+            logger.LogAccessDenied("PDP",subject,resource);
             return false;
         }
         if(startDate != 0 && startDate > now){
-            logger.LogAccessDenied("PDP",resource,subject);
+            logger.LogAccessDenied("PDP",subject,resource);
             return false;
         }
         if(endDate != 0 && endDate < now){
-            logger.LogAccessDenied("PDP",resource,subject);
+            logger.LogAccessDenied("PDP",subject,resource);
             return false;
         }
-        logger.LogAccessGranted("PDP",resource,subject);
+        logger.LogAccessGranted("PDP",subject,resource);
         return true;
     }
 }

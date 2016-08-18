@@ -46998,7 +46998,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[Disposable,LockAPI,AccessToken,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -47565,7 +47565,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 	};
 
 	$scope.eventStatus = $scope.watchStatus.NotWatching;
-	//$scope.eventLog = getEventLog();
+	$scope.eventLog = getEventLog();
 	//$scope.transactionLog = getTransactionLog();
 	var eventWatcher;
 
@@ -47777,10 +47777,12 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	$scope.device.permissions=[];
 	if($routeParams.resource){
 		$scope.editMode=true;
+		$scope.pageTitle="1. Edit Device Details";
 		initialisefromData($routeParams.resource);
 	}
 	else{
 		$scope.editMode=false;
+		$scope.pageTitle="1. Add Device Details";
 		initialisefromEmpty();
 	} 
 	
