@@ -8,30 +8,30 @@
 		<div class="col-sm-6">
 			
 			<label for="address">Address <small>(required)</small></label>
-			<input ng-model="device.address" type="text" id="address" name="address" placeholder="*Address" class="form-control" maxlength="32" readonly>
+			<input ng-model="device.address" type="text" id="address" name="address" placeholder="*Address" class="form-control" readonly>
 			<p>
 
 			<label for="title">Title <small>(required)</small></label>
-			<input ng-model="device.title" type="text" id="title" name="title" placeholder="*Title" class="form-control" maxlength="32">
+			<input ng-model="device.title" type="text" id="title" name="title" placeholder="*Title" class="form-control">
 			<p>
 			
 			<label for="description">Description <small>(required)</small></label>
-			<input ng-model="device.description" type="text" id="description" name="description" placeholder="*Description" class="form-control" maxlength="32">
+			<input ng-model="device.description" type="text" id="description" name="description" placeholder="*Description" class="form-control">
 			<p>
 
 			<label for="model">Model <small>(required)</small></label>
-			<input ng-model="device.model" type="text" id="model" name="model" placeholder="*Model" class="form-control" maxlength="32">
+			<input ng-model="device.model" type="text" id="model" name="model" placeholder="*Model" class="form-control">
 			<p>
 		
 		</div>
 		<div class="col-sm-6">
 
 			<label for="manuafcturer">Manufacturer </label>
-			<input ng-model="device.manufacturer" type="text" id="manufacturer" name="manufacturer" placeholder="*Manufacturer" class="form-control" maxlength="32" readonly>
+			<input ng-model="device.manufacturer" type="text" id="manufacturer" name="manufacturer" placeholder="*Manufacturer" class="form-control" ng-maxlength="32" readonly>
 			<p>
 
-			<label for="title">Installed Date </label>
-			<input ng-model="device.installed" type="text" id="installed" name="installed" placeholder="*Installed" class="form-control" maxlength="32" readonly>
+			<label for="installed">Installed Date </label>
+			<input ng-model="device.installed" type="text" id="installed" name="installed" placeholder="*Installed" class="form-control" ng-maxlength="32" readonly>
 			<p>
 
 			<label class="custom-control custom-checkbox large">
@@ -39,6 +39,9 @@
   				<span class="custom-control-indicator"></span>
   				<span class="custom-control-description">Locked</span>
 			</label>
+
+			<p>{{device.title}}</p>
+			<p>{{device.description}}</p>
 			
 		</div>
 	</div>

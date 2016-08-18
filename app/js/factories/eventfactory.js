@@ -12,18 +12,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 angular.module("LockChain").factory("EventFactory", function(){
 
+	var lockAPIContract = LockAPI.deployed();
+	var logServiceContract = LogService.deployed();
+	
 	///////////////////////////////////////////////////////////////////////////
 	// Event Registration
 	// Provides a Hook for client code to register an event
 	// Returns the event instance
 	///////////////////////////////////////////////////////////////////////////
 	var registerForEvents = function(filterOptions){
-
-		//var lockAPIContract = LockAPI.deployed();
-		//var eventWatcher = lockAPIContract.StateChanged({},filterOptions);
 		var logServiceContract = LogService.deployed();
-		var eventWatcher = logServiceContract.StateChanged({},filterOptions);
-		console.log(eventWatcher);
+		var eventWatcher = logServiceContract.allEvents({},filterOptions);
 		return eventWatcher;	
 	};
 
@@ -34,7 +33,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 	///////////////////////////////////////////////////////////////////////////
 	var startWatching =function(eventWatcher, callback){
 		eventWatcher.watch(function(error, result){
-  			console.log(result);
+  			console.log("Event Watcher Started");
   			callback(error,result);
     	});
 	};
@@ -44,6 +43,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 	// Stop Watching the Event, Disables the event on the chain 
 	///////////////////////////////////////////////////////////////////////////
 	var stopWatching=function(eventWatcher){
+		console.log("Event Watcher Stopped");
 		eventWatcher.stopWatching();
 	};
 
@@ -52,7 +52,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 	// Stop Watching the Event, Disables the event on the chain 
 	///////////////////////////////////////////////////////////////////////////
 	var getTransactionLog = function(filterOptions, callback){
-		var lockAPIContract = LockAPI.deployed();
+
 		var filter = web3.eth.filter(filterOptions);
 		filter.get(function(error, result){
 			callback(error,result);
@@ -65,25 +65,8 @@ angular.module("LockChain").factory("EventFactory", function(){
 	// Returns the event History based on the filter options
 	// Useful when not wishing to start an event
 	///////////////////////////////////////////////////////////////////////////
-	//var getEventLog=function(eventWatcher, callback){
-	//	eventWatcher.get(function(error,result){
-	//		callback(error,result);	
-	//	});	
-	//};
-	//var getEventLog=function(eventWatcher){
-	//	return eventWatcher.get();
-	//};
-	//var getEventLog=function(filterOptions, callback){
-	//	var lockAPIContract = LockAPI.deployed();
-	//	var filter = lockAPIContract.allEvents(filterOptions);
-	//	console.log(filter);
-	//	var filterResults = filter.get(function(error,result){
-	//		callback(error,result);	
-	//	});	
-	//};
-
 	var getEventLog=function(filterOptions, callback){
-		var logServiceContract = LogService.deployed();
+
 		var filter = logServiceContract.allEvents(filterOptions);
 		console.log(filter);
 		var filterResults = filter.get(function(error,result){
@@ -91,13 +74,6 @@ angular.module("LockChain").factory("EventFactory", function(){
 		});	
 	};
 
-	//var getEventLog = function(filterOptions,callback){
-	//	var filter = web3.eth.filter(filterOptions)
-	//	var filterResults = filter.get(function(error,result){
-	//		callback(error,result)
-	//	});
-	//	
-	//}
 
 	return{
 		registerForEvents: registerForEvents,

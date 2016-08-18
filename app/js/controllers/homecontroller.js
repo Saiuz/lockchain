@@ -30,12 +30,21 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Load Data For Selected Account
 	///////////////////////////////////////////////////////////////////////
 	function getRegisteredForAccount(account){
-		LockFactory.getRegisteredForAccount(account, function(result){
+		LockFactory.getRegisteredForAccount(account)
+		.then(function(result){
 			$scope.$apply(function(){
 				$scope.household=result;
 			});
 		});
 	}
+
+	/*function getRegisteredForAccount(account){
+		LockFactory.getRegisteredForAccount(account, function(result){
+			$scope.$apply(function(){
+				$scope.household=result;
+			});
+		});
+	}*/
 
 	///////////////////////////////////////////////////////////////////////
 	// Handle Selected Account Changed Event
@@ -63,7 +72,8 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Use the Lock Factory To Post the Locking Transaction
 	///////////////////////////////////////////////////////////////////////
 	function lock(index){
-		LockFactory.lock($scope.selectedAccount,$scope.household[index].address, function(result){
+		LockFactory.lock($scope.selectedAccount,$scope.household[index].address)
+		.then(function(result){
 			$scope.$apply(function(){
 				$scope.household[index].isLocked = true;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].isLocked);		
@@ -76,7 +86,8 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Use the Lock Factory To Post the Unlocking Transaction
 	///////////////////////////////////////////////////////////////////////
 	function unlock(index){
-		LockFactory.unlock($scope.selectedAccount,$scope.household[index].address, function(result){
+		LockFactory.unlock($scope.selectedAccount,$scope.household[index].address)
+		.then(function(){	
 			$scope.$apply(function(){
 				$scope.household[index].isLocked = false;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].isLocked);

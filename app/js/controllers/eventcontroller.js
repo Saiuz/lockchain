@@ -19,12 +19,12 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 	};
 
 	$scope.eventStatus = $scope.watchStatus.NotWatching;
-	$scope.eventLog = getEventLog();
-	//$scope.transactionLog = getTransactionLog();
+	$scope.eventLog = getEventLog({});
 	var eventWatcher;
 
 	///////////////////////////////////////////////////////////////////////
 	// Toggle Blockchain Event Trace
+	// Starts Watching for Events or stops Watching for Events
 	///////////////////////////////////////////////////////////////////////
 	$scope.toggleEventTrace = function(){
 		if($scope.eventStatus == $scope.watchStatus.NotWatching){
@@ -37,6 +37,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 
 	///////////////////////////////////////////////////////////////////////
 	// Coversion Utility For Displaying Hex Strings As Text
+	// Decodes Bytes32 Responses (Called By Front End)
 	///////////////////////////////////////////////////////////////////////
 	$scope.toAscii = function(item){
 		if(item){return web3.toAscii(item)};
@@ -44,40 +45,50 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 
 	///////////////////////////////////////////////////////////////////////
 	// Get Blockchain Transaction Log
+	// Returns The Blockchain Transaction Log (Not The Contract Event Log)
+	// Based On the filter provided
 	///////////////////////////////////////////////////////////////////////
-	function getTransactionLog(){
+	function getTransactionLog(filterOptions){
 		var lockAPIContract = LockAPI.deployed();
 		var lastBlock = 0;
+		var firstBlock = 0;
 
 		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 20){
-			lastBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
+			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
 		}
 		
-		var filterOptions  = {address: lockAPIContract.address, fromBlock: lastBlock, toBlock: 'latest'};
+		filterOptions  = {address: lockAPIContract.address, fromBlock: firstBlock, toBlock: "latest"};
 		EventFactory.getTransactionLog(filterOptions,function(error,result){
-			$scope.transactionLog=result;	
-			console.log(result);
+			$scope.$apply(function(){
+				$scope.transactionLog=result;
+			});	
 		});
 		return [];
 	}
 
 	///////////////////////////////////////////////////////////////////////
 	// Get Blockchain Event Log
+	// Returns The BlockChain Contract Event Log Collected By The Log
+	// service, Filtered By The Filter Options
 	///////////////////////////////////////////////////////////////////////
-	function getEventLog(){
+	function getEventLog(filterOptions){
 		
-		var lastBlock = 0;
+		var lastBlock = 0; var firstBlock = 0;
+
 		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 20){
-			lastBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
+			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
 		}
 		
-		var filterOptions  = {fromBlock: lastBlock, toBlock: 'latest'};
-		console.log(filterOptions);
+		filterOptions  = {fromBlock: firstBlock, toBlock: "latest"};
 		
 		EventFactory.getEventLog(filterOptions,function(error,result){
-			$scope.eventLog = result;
-			console.log(result);
+			$scope.$apply(function(){
+				$scope.eventLog = result;
+				console.log("Retreived Contract Events");			
+				console.log(result);
+			});
 		});
+		
 		//////////////////////////////////////////////////////
 		// Return Immediately So When Results Are Loaded
 		// A Scope Change Will Be Triggered On The Model
@@ -88,6 +99,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 
 	///////////////////////////////////////////////////////////////////////
 	// Start Blockchain Event Trace
+	// Start A Watcher Function On The Log Service
 	///////////////////////////////////////////////////////////////////////
 	function startEventWatch(){
 	
@@ -103,11 +115,15 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		EventFactory.startWatching(eventWatcher, function(error, result){
 			if(!error){
 				$scope.$apply(function(){
+					console.log("Received Event Notification");
 					$scope.eventStatus = $scope.watchStatus.Received + " " + result.event;
 		        	$scope.event = result;
-		        	getEventLog();
-		        	//getTransactionLog();
+		        	getEventLog({});
 		        });
+			}
+			else{
+				console.log("Received Event Notification Error");
+				console.log(error)
 			}
 
 		});		

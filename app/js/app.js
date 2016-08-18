@@ -24,7 +24,7 @@ angular.module("LockChain").config(["$routeProvider", function($routeProvider) {
         templateUrl : "register.html",
         controller  : "RegisterController"
       }).     
-      when("/details/:resource", {
+      when("/register/:resource", {
         templateUrl : "register.html",
         controller  : "RegisterController"
       }).  

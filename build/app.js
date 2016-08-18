@@ -47465,7 +47465,7 @@ angular.module("LockChain").config(["$routeProvider", function($routeProvider) {
         templateUrl : "register.html",
         controller  : "RegisterController"
       }).     
-      when("/details/:resource", {
+      when("/register/:resource", {
         templateUrl : "register.html",
         controller  : "RegisterController"
       }).  
@@ -47565,12 +47565,12 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 	};
 
 	$scope.eventStatus = $scope.watchStatus.NotWatching;
-	$scope.eventLog = getEventLog();
-	//$scope.transactionLog = getTransactionLog();
+	$scope.eventLog = getEventLog({});
 	var eventWatcher;
 
 	///////////////////////////////////////////////////////////////////////
 	// Toggle Blockchain Event Trace
+	// Starts Watching for Events or stops Watching for Events
 	///////////////////////////////////////////////////////////////////////
 	$scope.toggleEventTrace = function(){
 		if($scope.eventStatus == $scope.watchStatus.NotWatching){
@@ -47583,6 +47583,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 
 	///////////////////////////////////////////////////////////////////////
 	// Coversion Utility For Displaying Hex Strings As Text
+	// Decodes Bytes32 Responses (Called By Front End)
 	///////////////////////////////////////////////////////////////////////
 	$scope.toAscii = function(item){
 		if(item){return web3.toAscii(item)};
@@ -47590,40 +47591,50 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 
 	///////////////////////////////////////////////////////////////////////
 	// Get Blockchain Transaction Log
+	// Returns The Blockchain Transaction Log (Not The Contract Event Log)
+	// Based On the filter provided
 	///////////////////////////////////////////////////////////////////////
-	function getTransactionLog(){
+	function getTransactionLog(filterOptions){
 		var lockAPIContract = LockAPI.deployed();
 		var lastBlock = 0;
+		var firstBlock = 0;
 
 		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 20){
-			lastBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
+			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
 		}
 		
-		var filterOptions  = {address: lockAPIContract.address, fromBlock: lastBlock, toBlock: 'latest'};
+		filterOptions  = {address: lockAPIContract.address, fromBlock: firstBlock, toBlock: "latest"};
 		EventFactory.getTransactionLog(filterOptions,function(error,result){
-			$scope.transactionLog=result;	
-			console.log(result);
+			$scope.$apply(function(){
+				$scope.transactionLog=result;
+			});	
 		});
 		return [];
 	}
 
 	///////////////////////////////////////////////////////////////////////
 	// Get Blockchain Event Log
+	// Returns The BlockChain Contract Event Log Collected By The Log
+	// service, Filtered By The Filter Options
 	///////////////////////////////////////////////////////////////////////
-	function getEventLog(){
+	function getEventLog(filterOptions){
 		
-		var lastBlock = 0;
+		var lastBlock = 0; var firstBlock = 0;
+
 		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 20){
-			lastBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
+			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
 		}
 		
-		var filterOptions  = {fromBlock: lastBlock, toBlock: 'latest'};
-		console.log(filterOptions);
+		filterOptions  = {fromBlock: firstBlock, toBlock: "latest"};
 		
 		EventFactory.getEventLog(filterOptions,function(error,result){
-			$scope.eventLog = result;
-			console.log(result);
+			$scope.$apply(function(){
+				$scope.eventLog = result;
+				console.log("Retreived Contract Events");			
+				console.log(result);
+			});
 		});
+		
 		//////////////////////////////////////////////////////
 		// Return Immediately So When Results Are Loaded
 		// A Scope Change Will Be Triggered On The Model
@@ -47634,6 +47645,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 
 	///////////////////////////////////////////////////////////////////////
 	// Start Blockchain Event Trace
+	// Start A Watcher Function On The Log Service
 	///////////////////////////////////////////////////////////////////////
 	function startEventWatch(){
 	
@@ -47649,11 +47661,15 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		EventFactory.startWatching(eventWatcher, function(error, result){
 			if(!error){
 				$scope.$apply(function(){
+					console.log("Received Event Notification");
 					$scope.eventStatus = $scope.watchStatus.Received + " " + result.event;
 		        	$scope.event = result;
-		        	getEventLog();
-		        	//getTransactionLog();
+		        	getEventLog({});
 		        });
+			}
+			else{
+				console.log("Received Event Notification Error");
+				console.log(error)
 			}
 
 		});		
@@ -47703,12 +47719,21 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Load Data For Selected Account
 	///////////////////////////////////////////////////////////////////////
 	function getRegisteredForAccount(account){
-		LockFactory.getRegisteredForAccount(account, function(result){
+		LockFactory.getRegisteredForAccount(account)
+		.then(function(result){
 			$scope.$apply(function(){
 				$scope.household=result;
 			});
 		});
 	}
+
+	/*function getRegisteredForAccount(account){
+		LockFactory.getRegisteredForAccount(account, function(result){
+			$scope.$apply(function(){
+				$scope.household=result;
+			});
+		});
+	}*/
 
 	///////////////////////////////////////////////////////////////////////
 	// Handle Selected Account Changed Event
@@ -47736,7 +47761,8 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Use the Lock Factory To Post the Locking Transaction
 	///////////////////////////////////////////////////////////////////////
 	function lock(index){
-		LockFactory.lock($scope.selectedAccount,$scope.household[index].address, function(result){
+		LockFactory.lock($scope.selectedAccount,$scope.household[index].address)
+		.then(function(result){
 			$scope.$apply(function(){
 				$scope.household[index].isLocked = true;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].isLocked);		
@@ -47749,7 +47775,8 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Use the Lock Factory To Post the Unlocking Transaction
 	///////////////////////////////////////////////////////////////////////
 	function unlock(index){
-		LockFactory.unlock($scope.selectedAccount,$scope.household[index].address, function(result){
+		LockFactory.unlock($scope.selectedAccount,$scope.household[index].address)
+		.then(function(){	
 			$scope.$apply(function(){
 				$scope.household[index].isLocked = false;
 				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].isLocked);
@@ -47816,32 +47843,29 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	function initialisefromData(resource){
 
-		
-		LockFactory.getResource(resource, function(result){
-			$scope.$apply(function(){
-				$scope.device.address=resource;
-				$scope.device.title=result.title;
-				$scope.device.model=result.model;
-				$scope.device.description=result.description;
-				$scope.device.isLocked=result.isLocked;
-			});
-		});
-
-		PolicyFactory.getPolicy(resource, function(result){
-			
-			for(i=0; i < $scope.accounts.length; i++){
-				permission = {name:$scope.accounts[i],startDate:0,endDate:0, grant:false};
-				for(j=0; j < result.length; j++){
-					if(result[j].issuedTo == $scope.accounts[i]){
-						permission = {name:result[j].issuedTo,startDate:result[j].startDate,endDate:result[j].endDate, grant:true};
-						break;
+		LockFactory.getResource(resource)
+		.then(function(data){
+			console.log(data);
+			PolicyFactory.getPolicy(resource)
+			.then(function(result){
+				var permissions = []
+				for(i=0; i < $scope.accounts.length; i++){
+					permission = {name:$scope.accounts[i],startDate:0,endDate:0, grant:false};
+					for(j=0; j < result.length; j++){
+						if(result[j].issuedTo == $scope.accounts[i]){
+							permission = {name:result[j].issuedTo,startDate:result[j].startDate,endDate:result[j].endDate, grant:true};
+							break;	
+						}
 					}
-
+					permissions[i] = permission;
 				}
+				data.permissions=permissions;
 				$scope.$apply(function(){
-					$scope.device.permissions[i] = permission;	
+					$scope.device=data;
 				});
-			}
+
+			});
+
 		});
 	}
 
@@ -47854,11 +47878,14 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	$scope.register = function(){
 
-		LockFactory.register($scope.selectedAccount,$scope.device,function(result){
+		LockFactory.register($scope.selectedAccount,$scope.device)
+		.then(function(result){
 			console.log(result);
-			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device,function(result){
+			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
+			.then(function(result){
 				console.log(result);
 			});
+
 		});
 	}
 
@@ -47871,11 +47898,12 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	$scope.setPolicy = function(){
 
-		LockFactory.register($scope.selectedAccount,$scope.device,function(result){
+		LockFactory.register($scope.selectedAccount,$scope.device)
+		.then(function(result){	
 			console.log(result);
-			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device,function(result){
-				console.log(result);
-			}).then(function(){
+			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
+			.then(function(result){
+				console.log(result);	
 				$scope.$apply(function(){
 					$location.path("/");
 				});
@@ -48029,18 +48057,17 @@ angular.module("LockChain").factory("AccountFactory", function(){
 ///////////////////////////////////////////////////////////////////////////////
 angular.module("LockChain").factory("EventFactory", function(){
 
+	var lockAPIContract = LockAPI.deployed();
+	var logServiceContract = LogService.deployed();
+	
 	///////////////////////////////////////////////////////////////////////////
 	// Event Registration
 	// Provides a Hook for client code to register an event
 	// Returns the event instance
 	///////////////////////////////////////////////////////////////////////////
 	var registerForEvents = function(filterOptions){
-
-		//var lockAPIContract = LockAPI.deployed();
-		//var eventWatcher = lockAPIContract.StateChanged({},filterOptions);
 		var logServiceContract = LogService.deployed();
-		var eventWatcher = logServiceContract.StateChanged({},filterOptions);
-		console.log(eventWatcher);
+		var eventWatcher = logServiceContract.allEvents({},filterOptions);
 		return eventWatcher;	
 	};
 
@@ -48051,7 +48078,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 	///////////////////////////////////////////////////////////////////////////
 	var startWatching =function(eventWatcher, callback){
 		eventWatcher.watch(function(error, result){
-  			console.log(result);
+  			console.log("Event Watcher Started");
   			callback(error,result);
     	});
 	};
@@ -48061,6 +48088,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 	// Stop Watching the Event, Disables the event on the chain 
 	///////////////////////////////////////////////////////////////////////////
 	var stopWatching=function(eventWatcher){
+		console.log("Event Watcher Stopped");
 		eventWatcher.stopWatching();
 	};
 
@@ -48069,7 +48097,7 @@ angular.module("LockChain").factory("EventFactory", function(){
 	// Stop Watching the Event, Disables the event on the chain 
 	///////////////////////////////////////////////////////////////////////////
 	var getTransactionLog = function(filterOptions, callback){
-		var lockAPIContract = LockAPI.deployed();
+
 		var filter = web3.eth.filter(filterOptions);
 		filter.get(function(error, result){
 			callback(error,result);
@@ -48082,25 +48110,8 @@ angular.module("LockChain").factory("EventFactory", function(){
 	// Returns the event History based on the filter options
 	// Useful when not wishing to start an event
 	///////////////////////////////////////////////////////////////////////////
-	//var getEventLog=function(eventWatcher, callback){
-	//	eventWatcher.get(function(error,result){
-	//		callback(error,result);	
-	//	});	
-	//};
-	//var getEventLog=function(eventWatcher){
-	//	return eventWatcher.get();
-	//};
-	//var getEventLog=function(filterOptions, callback){
-	//	var lockAPIContract = LockAPI.deployed();
-	//	var filter = lockAPIContract.allEvents(filterOptions);
-	//	console.log(filter);
-	//	var filterResults = filter.get(function(error,result){
-	//		callback(error,result);	
-	//	});	
-	//};
-
 	var getEventLog=function(filterOptions, callback){
-		var logServiceContract = LogService.deployed();
+
 		var filter = logServiceContract.allEvents(filterOptions);
 		console.log(filter);
 		var filterResults = filter.get(function(error,result){
@@ -48108,13 +48119,6 @@ angular.module("LockChain").factory("EventFactory", function(){
 		});	
 	};
 
-	//var getEventLog = function(filterOptions,callback){
-	//	var filter = web3.eth.filter(filterOptions)
-	//	var filterResults = filter.get(function(error,result){
-	//		callback(error,result)
-	//	});
-	//	
-	//}
 
 	return{
 		registerForEvents: registerForEvents,
@@ -48165,7 +48169,39 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	// Policy Describes What Each Subject Can Do Against The Resource
 	// Returns Array of Policy Objects Via Callback
 	///////////////////////////////////////////////////////////////////////////
-	var getPolicy = function(resource, callback){
+	var getPolicy = function(resource){
+
+		var promise =
+			tokenContract.GetTokensForResource(resource)
+			.then(function(result){
+				var policyList = []; var promises = [];
+				for(i=0; i<result.length;i++){
+					policyList.push({subject:result[i]});
+					promises.push(tokenContract.GetToken(result[i],resource));
+				}
+				return Promise.all(promises).then(function(dataList){
+					var index = 0;
+					dataList.forEach(function(data){
+						policyList[index].issuedTo=data[0];
+						policyList[index].issuedFor=data[1];
+						policyList[index].startDate=Date(data[2]);
+						policyList[index].endDate=Date(data[3]);
+						index++;
+					});
+
+				})
+				.then(function(){
+					return policyList;
+				})
+				.catch(function(error){
+					console.log(error);
+				});
+			});
+			return promise;
+
+	};
+
+	/*var getPolicy = function(resource, callback){
 
 		var policyList = [];
 		var promises = [];
@@ -48196,7 +48232,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 
 		});
 
-	};
+	};*/
 
 
 
@@ -48208,7 +48244,34 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	// Execute all promises
 	// Callback returns list of transaction identifiers
 	///////////////////////////////////////////////////////////////////////////
-	var setPolicy = function(account, resource, callback){
+	var setPolicy = function(account, resource){
+		
+		var promises=[];
+		for(i=0;i < resource.permissions.length; i++){
+			var item = resource.permissions[i];
+			if(item.grant){
+				var startDate = 0; var endDate = 0;
+				if(item.startDate != 0){
+					startDate = (item.startDate.getTime()/1000).toFixed(0);
+				}
+				if(item.endDate != 0){
+					endDate = (item.endDate.getTime()/1000).toFixed(0);
+				}
+				promises.push(tokenContract.Grant(item.name, resource.address, startDate, endDate,{from:account}));
+			}
+		}
+
+		var promise =
+			Promise.all(promises).then(function(txnList){
+				return txnList;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;	
+		
+	};
+	/*var setPolicy = function(account, resource, callback){
 		
 		promises=[];
 
@@ -48234,7 +48297,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 			console.log(error);
 		});
 		
-	};
+	};*/
 
 	return{
 		getPolicy:getPolicy,
@@ -48270,14 +48333,15 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource : Resource object to register
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var register = function(account, resource, callback){
-		lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account})
+	var register = function(account, resource){
+		var promise = lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account})
 		.then(function(result){
-			callback(result);
+			return result;
 		})
 		.catch(function(e){
 			console.log(e);
 		});
+		return promise;
 	};
 
 	///////////////////////////////////////////////////////////////////////////
@@ -48289,14 +48353,16 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource : Resource object to transfer
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var transfer = function(account, resource, newOwner, callback){
-		lockContract.Transfer(resource.address, newOwner, {from:account})
-		.then(function(result){
-			callback(result);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
+	var transfer = function(account, resource, newOwner){
+		var promise = 
+			lockContract.Transfer(resource.address, newOwner, {from:account})
+			.then(function(result){
+				return result;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+			return promise;
 	};
 
 
@@ -48316,35 +48382,37 @@ angular.module("LockChain").factory("LockFactory", function(){
 	///////////////////////////////////////////////////////////////////////////
 	var getRegisteredForAccount = function(account, callback){
 		
-		var deviceList = [];
-		var promises = [];
-		accessContract.GetTokensForSubject(account)
-		.then(function(result){
-			for(i=0; i<result.length;i++){
-				deviceList.push({address:result[i]});
-				promises.push(lockContract.lockAttrs(result[i]));
-			}
-			return Promise.all(promises).then(function(dataList){
-				var index = 0;
-				dataList.forEach(function(data){
-					deviceList[index].title=web3.toAscii(data[0]);
-					deviceList[index].model=web3.toAscii(data[1]);
-					deviceList[index].description=web3.toAscii(data[2]);
-					deviceList[index].isLocked=data[3];
-					index++;
-				});
+		var promise = 
+			accessContract.GetTokensForSubject(account)
+			.then(function(result){
+				var deviceList = [];
+				var promises = [];
+				for(i=0; i<result.length;i++){
+					deviceList.push({address:result[i]});
+					promises.push(lockContract.lockAttrs(result[i]));
+				}
+				return Promise.all(promises).then(function(dataList){
+					var index = 0;
+					dataList.forEach(function(data){
+						deviceList[index].title=web3.toAscii(data[0]);
+						deviceList[index].model=web3.toAscii(data[1]);
+						deviceList[index].description=web3.toAscii(data[2]);
+						deviceList[index].isLocked=data[3];
+						index++;
+					});
 
-			})
-			.then(function(){
-				callback(deviceList);
-			})
-			.catch(function(error){
-				console.log(error);
+				})
+				.then(function(){
+					return deviceList;
+				})
+				.catch(function(error){
+					console.log(error);
+				});
 			});
-		});
+		return promise;	
 		
 	};
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	// Function Export getResource
 	// Returns a previously created device at a specified adddess
@@ -48353,21 +48421,20 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// account 	: resource account to retrieve
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var getResource = function(resource, callback){
-		lockContract.lockAttrs(resource)
-		.then(function(data){
-			device={};
-			device.address=resource;
-			device.title=web3.toAscii(data[0]);
-			device.model=web3.toAscii(data[1]);
-			device.description=web3.toAscii(data[2]);
-			device.isLocked=data[3];
-			callback(device);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
-	}
+	var getResource = function(resource){
+		var promise = 
+			lockContract.lockAttrs(resource)
+		    .then(function(data){
+		       	device={};
+				device.address=resource;
+				device.title=web3.toAscii(data[0]);
+				device.model=web3.toAscii(data[1]);
+				device.description=web3.toAscii(data[2]);
+				device.isLocked=data[3];
+				return device;
+		    }); 
+		return promise;       
+	};
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Pointer Lock
@@ -48378,14 +48445,16 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource  : address of the resource to lock
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var lock = function(account, resource, callback){
-		lockContract.Lock(resource, {from:account})
-		.then(function(response){
-			callback(response);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
+	var lock = function(account, resource){
+		var promise = 
+			lockContract.Lock(resource, {from:account})
+			.then(function(response){
+				return response;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;	
 	};
 
 	///////////////////////////////////////////////////////////////////////////
@@ -48397,14 +48466,16 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource  : address of the resource to lock
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var unlock = function(account, resource, callback){
-		lockContract.Unlock(resource,{from:account})
-		.then(function(response){
-			callback(response);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
+	var unlock = function(account, resource){
+		var promise =
+			lockContract.Unlock(resource,{from:account})
+			.then(function(response){
+				return response;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;	
 	};
 
 	return{

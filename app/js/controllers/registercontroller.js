@@ -54,32 +54,29 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	function initialisefromData(resource){
 
-		
-		LockFactory.getResource(resource, function(result){
-			$scope.$apply(function(){
-				$scope.device.address=resource;
-				$scope.device.title=result.title;
-				$scope.device.model=result.model;
-				$scope.device.description=result.description;
-				$scope.device.isLocked=result.isLocked;
-			});
-		});
-
-		PolicyFactory.getPolicy(resource, function(result){
-			
-			for(i=0; i < $scope.accounts.length; i++){
-				permission = {name:$scope.accounts[i],startDate:0,endDate:0, grant:false};
-				for(j=0; j < result.length; j++){
-					if(result[j].issuedTo == $scope.accounts[i]){
-						permission = {name:result[j].issuedTo,startDate:result[j].startDate,endDate:result[j].endDate, grant:true};
-						break;
+		LockFactory.getResource(resource)
+		.then(function(data){
+			console.log(data);
+			PolicyFactory.getPolicy(resource)
+			.then(function(result){
+				var permissions = []
+				for(i=0; i < $scope.accounts.length; i++){
+					permission = {name:$scope.accounts[i],startDate:0,endDate:0, grant:false};
+					for(j=0; j < result.length; j++){
+						if(result[j].issuedTo == $scope.accounts[i]){
+							permission = {name:result[j].issuedTo,startDate:result[j].startDate,endDate:result[j].endDate, grant:true};
+							break;	
+						}
 					}
-
+					permissions[i] = permission;
 				}
+				data.permissions=permissions;
 				$scope.$apply(function(){
-					$scope.device.permissions[i] = permission;	
+					$scope.device=data;
 				});
-			}
+
+			});
+
 		});
 	}
 
@@ -92,11 +89,14 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	$scope.register = function(){
 
-		LockFactory.register($scope.selectedAccount,$scope.device,function(result){
+		LockFactory.register($scope.selectedAccount,$scope.device)
+		.then(function(result){
 			console.log(result);
-			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device,function(result){
+			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
+			.then(function(result){
 				console.log(result);
 			});
+
 		});
 	}
 
@@ -109,11 +109,12 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	$scope.setPolicy = function(){
 
-		LockFactory.register($scope.selectedAccount,$scope.device,function(result){
+		LockFactory.register($scope.selectedAccount,$scope.device)
+		.then(function(result){	
 			console.log(result);
-			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device,function(result){
-				console.log(result);
-			}).then(function(){
+			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
+			.then(function(result){
+				console.log(result);	
 				$scope.$apply(function(){
 					$location.path("/");
 				});

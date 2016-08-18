@@ -41,7 +41,7 @@
         <img width=10% ng-src="{{device.isLocked?'images/locked.png':'images/unlocked.png'}}"/>{{device.isLocked ? " Locked" : " Unlocked"}}
       </p>
       <button ng-click="toggleLock($index)" class="btn btn-default">{{device.isLocked ? "Unlock" : "Lock"}}</button>
-      <a class="btn btn-default" href="#/details/{{device.address}}" role="button">Details</a>
+      <a class="btn btn-default" href="#/register/{{device.address}}" role="button">Details</a>
       <a class="btn btn-default" href="#/access" role="button">Access</a>
     </div>
   </div>

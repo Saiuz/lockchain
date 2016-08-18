@@ -24,14 +24,15 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource : Resource object to register
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var register = function(account, resource, callback){
-		lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account})
+	var register = function(account, resource){
+		var promise = lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account})
 		.then(function(result){
-			callback(result);
+			return result;
 		})
 		.catch(function(e){
 			console.log(e);
 		});
+		return promise;
 	};
 
 	///////////////////////////////////////////////////////////////////////////
@@ -43,14 +44,16 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource : Resource object to transfer
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var transfer = function(account, resource, newOwner, callback){
-		lockContract.Transfer(resource.address, newOwner, {from:account})
-		.then(function(result){
-			callback(result);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
+	var transfer = function(account, resource, newOwner){
+		var promise = 
+			lockContract.Transfer(resource.address, newOwner, {from:account})
+			.then(function(result){
+				return result;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+			return promise;
 	};
 
 
@@ -70,35 +73,37 @@ angular.module("LockChain").factory("LockFactory", function(){
 	///////////////////////////////////////////////////////////////////////////
 	var getRegisteredForAccount = function(account, callback){
 		
-		var deviceList = [];
-		var promises = [];
-		accessContract.GetTokensForSubject(account)
-		.then(function(result){
-			for(i=0; i<result.length;i++){
-				deviceList.push({address:result[i]});
-				promises.push(lockContract.lockAttrs(result[i]));
-			}
-			return Promise.all(promises).then(function(dataList){
-				var index = 0;
-				dataList.forEach(function(data){
-					deviceList[index].title=web3.toAscii(data[0]);
-					deviceList[index].model=web3.toAscii(data[1]);
-					deviceList[index].description=web3.toAscii(data[2]);
-					deviceList[index].isLocked=data[3];
-					index++;
-				});
+		var promise = 
+			accessContract.GetTokensForSubject(account)
+			.then(function(result){
+				var deviceList = [];
+				var promises = [];
+				for(i=0; i<result.length;i++){
+					deviceList.push({address:result[i]});
+					promises.push(lockContract.lockAttrs(result[i]));
+				}
+				return Promise.all(promises).then(function(dataList){
+					var index = 0;
+					dataList.forEach(function(data){
+						deviceList[index].title=web3.toAscii(data[0]);
+						deviceList[index].model=web3.toAscii(data[1]);
+						deviceList[index].description=web3.toAscii(data[2]);
+						deviceList[index].isLocked=data[3];
+						index++;
+					});
 
-			})
-			.then(function(){
-				callback(deviceList);
-			})
-			.catch(function(error){
-				console.log(error);
+				})
+				.then(function(){
+					return deviceList;
+				})
+				.catch(function(error){
+					console.log(error);
+				});
 			});
-		});
+		return promise;	
 		
 	};
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	// Function Export getResource
 	// Returns a previously created device at a specified adddess
@@ -107,21 +112,20 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// account 	: resource account to retrieve
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var getResource = function(resource, callback){
-		lockContract.lockAttrs(resource)
-		.then(function(data){
-			device={};
-			device.address=resource;
-			device.title=web3.toAscii(data[0]);
-			device.model=web3.toAscii(data[1]);
-			device.description=web3.toAscii(data[2]);
-			device.isLocked=data[3];
-			callback(device);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
-	}
+	var getResource = function(resource){
+		var promise = 
+			lockContract.lockAttrs(resource)
+		    .then(function(data){
+		       	device={};
+				device.address=resource;
+				device.title=web3.toAscii(data[0]);
+				device.model=web3.toAscii(data[1]);
+				device.description=web3.toAscii(data[2]);
+				device.isLocked=data[3];
+				return device;
+		    }); 
+		return promise;       
+	};
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Pointer Lock
@@ -132,14 +136,16 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource  : address of the resource to lock
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var lock = function(account, resource, callback){
-		lockContract.Lock(resource, {from:account})
-		.then(function(response){
-			callback(response);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
+	var lock = function(account, resource){
+		var promise = 
+			lockContract.Lock(resource, {from:account})
+			.then(function(response){
+				return response;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;	
 	};
 
 	///////////////////////////////////////////////////////////////////////////
@@ -151,14 +157,16 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// resource  : address of the resource to lock
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
-	var unlock = function(account, resource, callback){
-		lockContract.Unlock(resource,{from:account})
-		.then(function(response){
-			callback(response);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
+	var unlock = function(account, resource){
+		var promise =
+			lockContract.Unlock(resource,{from:account})
+			.then(function(response){
+				return response;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;	
 	};
 
 	return{
