@@ -47147,7 +47147,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[AccessToken,LockAPI,Disposable,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[Disposable,AccessToken,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -48127,12 +48127,58 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	}
 
 	///////////////////////////////////////////////////////////////////////////
+	// Function Grant
+	///////////////////////////////////////////////////////////////////////////
+	// Grants Rights to the Relevant Resource
+	// Parameters
+	// Index of Subject To Grant Resource Access To
+	///////////////////////////////////////////////////////////////////////////
+	$scope.grant = function(index){
+
+		PolicyFactory.grant($scope.selectedAccount, $scope.device.address, $scope.device.permissions[index])
+		.then(function(result){
+			
+			//Update The Screen???
+			console.log(result);
+		})
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// Function Revole
+	///////////////////////////////////////////////////////////////////////////
+	// Grants Rights to the Relevant Resource
+	// Parameters
+	// Index of Subject To Grant Resource Access To
+	///////////////////////////////////////////////////////////////////////////
+	$scope.revoke = function(index){
+
+		PolicyFactory.revoke($scope.selectedAccount, $scope.device.address, $scope.device.permissions[index])
+		.then(function(result){
+
+			// Should Really Have An Event Watcher To Update All Of This
+			$scope.$apply(function(){
+				$scope.device.permissions[index].startDate=0;
+				$scope.device.permissions[index].endDate=0;
+				$scope.device.permissions[index].startDateString="";
+				$scope.device.permissions[index].endDateString="";
+			});
+			console.log(result);
+		})
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////
 	// Function GrantToUser
 	///////////////////////////////////////////////////////////////////////////
 	// Update the Model When The User Chooses to Gtant Permissions
+	// Issues the gtrant or revole procedure as appropriate
 	///////////////////////////////////////////////////////////////////////////
 	$scope.grantToUser = function (index){
 		$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
+		if($scope.device.permissions[index].grant){
+			$scope.grant(index); return;
+		} 
+		$scope.revoke(index);
 	}	
 	
 
@@ -48425,40 +48471,6 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 
 	};
 
-	/*var getPolicy = function(resource, callback){
-
-		var policyList = [];
-		var promises = [];
-		tokenContract.GetTokensForResource(resource)
-		.then(function(result){
-
-			for(i=0; i<result.length;i++){
-				policyList.push({subject:result[i]});
-				promises.push(tokenContract.GetToken(result[i],resource));
-			}
-			return Promise.all(promises).then(function(dataList){
-				var index = 0;
-				dataList.forEach(function(data){
-					policyList[index].issuedTo=data[0];
-					policyList[index].issuedFor=data[1];
-					policyList[index].startDate=Date(data[2]);
-					policyList[index].endDate=Date(data[3]);
-					index++;
-				});
-
-			})
-			.then(function(){
-				callback(policyList);
-			})
-			.catch(function(error){
-				console.log(error);
-			});
-
-		});
-
-	};*/
-
-
 
 	///////////////////////////////////////////////////////////////////////////
 	// SetPolicy
@@ -48474,14 +48486,8 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		for(i=0;i < resource.permissions.length; i++){
 			var item = resource.permissions[i];
 			if(item.grant){
-				var startDate = (item.startDate == null ? 0 : item.startDate);
-				var endDate = (item.endDate == null ? 0 : item.endDate);
-				if(startDate != 0){
-					startDate = (item.startDate.getTime()/1000).toFixed(0);
-				}
-				if(endDate != 0){
-					endDate = (item.endDate.getTime()/1000).toFixed(0);
-				}
+				var startDate = dateToUnixTimestamp(item.startDate);
+				var endDate = dateToUnixTimestamp(item.endDate);
 				promises.push(tokenContract.Grant(item.name, resource.address, startDate, endDate,{from:account}));
 			}
 		}
@@ -48496,37 +48502,84 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		return promise;	
 		
 	};
-	/*var setPolicy = function(account, resource, callback){
-		
-		promises=[];
 
-		for(i=0;i < resource.permissions.length; i++){
-			var item = resource.permissions[i];
-			
-			if(item.grant){
-				var startDate = 0; var endDate = 0;
-				if(item.startDate != 0){
-					startDate = (item.startDate.getTime()/1000).toFixed(0);
-				}
-				if(item.endDate != 0){
-					endDate = (item.endDate.getTime()/1000).toFixed(0);
-				}
-				promises.push(tokenContract.Grant(item.name, resource.address, startDate, endDate,{from:account}));
-			}
+
+	///////////////////////////////////////////////////////////////////////////
+	// Grant
+	///////////////////////////////////////////////////////////////////////////
+	// Grants Rights To A Resource 
+	// Issues An Event When Complete So The UI Can Monitor What Is Happening
+	// It is not Possible to return data from blockchain transactions
+	// only calls
+	///////////////////////////////////////////////////////////////////////////
+	// Returns Promise
+	///////////////////////////////////////////////////////////////////////////
+	var grant = function(account, resource, permission){
+
+		var subject = permission.name;
+		var startDate = dateToUnixTimestamp(permission.startDate);
+		var endDate = dateToUnixTimestamp(permission.endDate);
+
+		var promise =
+			tokenContract.Grant(subject,resource,startDate,endDate, {from:account})
+			.then(function(result){
+				return result;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;	
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// Revoke
+	///////////////////////////////////////////////////////////////////////////
+	// Revokes Rights From A Resource 
+	// Issues An Event When Complete So The UI Can Monitor What Is Happening
+	// It is not Possible to return data from blockchain transactions
+	// only calls
+	///////////////////////////////////////////////////////////////////////////
+	// Returns Promise
+	///////////////////////////////////////////////////////////////////////////
+	var revoke = function(account, resource, permission){
+
+		var subject = permission.name;
+
+		var promise =
+			tokenContract.Revoke(subject,resource,{from:account})
+			.then(function(result){
+				return result;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;	
+		
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// dateToUnixTimestamp
+	///////////////////////////////////////////////////////////////////////////
+	// Helper Routine To Convert Date Types To Unix Timestamps for
+	// Storage On The Blockchain
+	///////////////////////////////////////////////////////////////////////////
+	// Returns Promise
+	///////////////////////////////////////////////////////////////////////////
+	function dateToUnixTimestamp(dateToConvert){
+
+		var newDate = (dateToConvert== null ? 0 : dateToConvert);
+		if(newDate != 0){
+			newDate = (dateToConvert.getTime()/1000).toFixed(0);
 		}
+		return newDate;
 
-		return Promise.all(promises).then(function(txnList){
-			callback(txnList);
-		})
-		.catch(function(error){
-			console.log(error);
-		});
-		
-	};*/
+	}
 
 	return{
 		getPolicy:getPolicy,
-		setPolicy:setPolicy
+		setPolicy:setPolicy,
+		grant:grant,
+		revoke:revoke
 	};
 
 });

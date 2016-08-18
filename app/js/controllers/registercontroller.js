@@ -128,12 +128,58 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	}
 
 	///////////////////////////////////////////////////////////////////////////
+	// Function Grant
+	///////////////////////////////////////////////////////////////////////////
+	// Grants Rights to the Relevant Resource
+	// Parameters
+	// Index of Subject To Grant Resource Access To
+	///////////////////////////////////////////////////////////////////////////
+	$scope.grant = function(index){
+
+		PolicyFactory.grant($scope.selectedAccount, $scope.device.address, $scope.device.permissions[index])
+		.then(function(result){
+			
+			//Update The Screen???
+			console.log(result);
+		})
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// Function Revole
+	///////////////////////////////////////////////////////////////////////////
+	// Grants Rights to the Relevant Resource
+	// Parameters
+	// Index of Subject To Grant Resource Access To
+	///////////////////////////////////////////////////////////////////////////
+	$scope.revoke = function(index){
+
+		PolicyFactory.revoke($scope.selectedAccount, $scope.device.address, $scope.device.permissions[index])
+		.then(function(result){
+
+			// Should Really Have An Event Watcher To Update All Of This
+			$scope.$apply(function(){
+				$scope.device.permissions[index].startDate=0;
+				$scope.device.permissions[index].endDate=0;
+				$scope.device.permissions[index].startDateString="";
+				$scope.device.permissions[index].endDateString="";
+			});
+			console.log(result);
+		})
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////
 	// Function GrantToUser
 	///////////////////////////////////////////////////////////////////////////
 	// Update the Model When The User Chooses to Gtant Permissions
+	// Issues the gtrant or revole procedure as appropriate
 	///////////////////////////////////////////////////////////////////////////
 	$scope.grantToUser = function (index){
 		$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
+		if($scope.device.permissions[index].grant){
+			$scope.grant(index); return;
+		} 
+		$scope.revoke(index);
 	}	
 	
 
