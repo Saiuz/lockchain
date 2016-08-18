@@ -23,7 +23,7 @@
         </div>
         <div class="row text-right" style="margin-right:0">
           <p>&nbsp;</p>
-          <a class="btn btn-success" href="#/register/{{selectedAccount}}" role="button">Register a New Device</a>
+          <a class="btn btn-success" href="#/register" role="button">Register a New Device</a>
           <p>&nbsp;</p>
         </div>
     </div>
@@ -31,15 +31,15 @@
   
   <div class="row panel panel-default" ng-Hide="household.length==0">
     <div class="col-sm-6 col-md-4 col-lg-4" ng-repeat= "device in household">
-      <h2>{{device.description}}</h2>
-      <p>{{device.title}}</p>
+      <h2>{{device.title}}</h2>
+      <p>{{device.description}}</p>
       <p>{{device.model}}</p>
       <p>{{device.address}}</p>
       <p>
         <img width=10% ng-src="{{device.isLocked?'images/locked.png':'images/unlocked.png'}}"/>{{device.isLocked ? " Locked" : " Unlocked"}}
       </p>
       <button ng-click="toggleLock($index)" class="btn btn-default">{{device.isLocked ? "Unlock" : "Lock"}}</button>
-      <a class="btn btn-default" href="#/details" role="button">Details</a>
+      <a class="btn btn-default" href="#/details/{{device.address}}" role="button">Details</a>
       <a class="btn btn-default" href="#/access" role="button">Access</a>
     </div>
   </div>

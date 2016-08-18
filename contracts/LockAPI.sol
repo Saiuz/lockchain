@@ -21,6 +21,10 @@ contract LockAPIBase is Disposable{
         policyDecisionPoint = pdp;  
         result = true;
     }
+
+    function getPolicyDecisionPoint() returns (PolicyDecisionBase result){
+        result = policyDecisionPoint;
+    }    
     
 }
 
@@ -52,7 +56,8 @@ contract LockAPI is LockAPIBase(){
     // Map of Owner to Device Address Count
     ////////////////////////////////////////////////////////////////////////////
     mapping(address=>uint) public ownerLockCount;
-    
+
+
     function LockAPI(PolicyDecisionBase pdp) LockAPIBase(pdp){}
     
     function Register(address identity, bytes32 title, bytes32 model, bytes32 description, bool isLocked) returns(bool result){

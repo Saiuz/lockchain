@@ -328,15 +328,32 @@ var Web3 = require("web3");
         "constant": false,
         "inputs": [
           {
+            "name": "msg",
+            "type": "bytes32"
+          }
+        ],
+        "name": "TestTrace",
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
             "name": "source",
             "type": "bytes32"
           },
           {
-            "name": "resource",
+            "name": "subject",
             "type": "address"
           },
           {
-            "name": "by",
+            "name": "resource",
             "type": "address"
           },
           {
@@ -361,11 +378,11 @@ var Web3 = require("web3");
             "type": "bytes32"
           },
           {
-            "name": "resource",
+            "name": "subject",
             "type": "address"
           },
           {
-            "name": "by",
+            "name": "resource",
             "type": "address"
           }
         ],
@@ -386,11 +403,11 @@ var Web3 = require("web3");
             "type": "bytes32"
           },
           {
-            "name": "resource",
+            "name": "subject",
             "type": "address"
           },
           {
-            "name": "by",
+            "name": "resource",
             "type": "address"
           }
         ],
@@ -420,12 +437,12 @@ var Web3 = require("web3");
           },
           {
             "indexed": true,
-            "name": "resource",
+            "name": "subject",
             "type": "address"
           },
           {
             "indexed": true,
-            "name": "by",
+            "name": "resource",
             "type": "address"
           },
           {
@@ -447,12 +464,12 @@ var Web3 = require("web3");
           },
           {
             "indexed": true,
-            "name": "resource",
+            "name": "subject",
             "type": "address"
           },
           {
             "indexed": true,
-            "name": "by",
+            "name": "resource",
             "type": "address"
           },
           {
@@ -474,12 +491,12 @@ var Web3 = require("web3");
           },
           {
             "indexed": true,
-            "name": "resource",
+            "name": "subject",
             "type": "address"
           },
           {
             "indexed": true,
-            "name": "by",
+            "name": "resource",
             "type": "address"
           },
           {
@@ -490,10 +507,22 @@ var Web3 = require("web3");
         ],
         "name": "AccessGranted",
         "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "name": "message",
+            "type": "bytes32"
+          }
+        ],
+        "name": "Trace",
+        "type": "event"
       }
     ],
-    "unlinked_binary": "0x606060405260008054600160a060020a031916331790556101ba806100246000396000f3606060405260e060020a6000350463310f03d1811461003c57806340960a1514610096578063715304c81461010d578063be26733c14610184575b005b6101a26004356024356044356064356060818152600090600160a060020a03848116919086169087907f49383088586f3ecdfe365a47abf025f4599caebbb9dc1f84444bbcb4c8f03fff90602090a4506001949350505050565b6101a26004356024356044357f416363657373204772616e7465640000000000000000000000000000000000006060908152600090600160a060020a03838116919085169086907f156794a2ebb71e4d17fe5fc62f7beaca4832122d7ad000fb62481435ffef3f2390602090a45060019392505050565b6101a26004356024356044357f4163636573732044656e696564000000000000000000000000000000000000006060908152600090600160a060020a03838116919085169086907ff48843a143fb8a66d79a8afc8303d947d0ad97ffcd414214aedfa176c2f31c3c90602090a45060019392505050565b61003a60005433600160a060020a039081169116146101ac57610002565b6060908152602090f35b600054600160a060020a0316ff",
-    "updated_at": 1471444059263,
+    "unlinked_binary": "0x606060405260008054600160a060020a03191633179055610201806100246000396000f3606060405260e060020a600035046324e789958114610047578063310f03d11461008357806340960a15146100dd578063715304c814610154578063be26733c146101cb575b005b6101e960043560608181526000907f6c7023bfcd8010893121ebb4d87d952cbbdb7438ff9d750c519b0545298808c390602090a1506001919050565b6101e96004356024356044356064356060818152600090600160a060020a03848116919086169087907f49383088586f3ecdfe365a47abf025f4599caebbb9dc1f84444bbcb4c8f03fff90602090a4506001949350505050565b6101e96004356024356044357f416363657373204772616e7465640000000000000000000000000000000000006060908152600090600160a060020a03838116919085169086907f156794a2ebb71e4d17fe5fc62f7beaca4832122d7ad000fb62481435ffef3f2390602090a45060019392505050565b6101e96004356024356044357f4163636573732044656e696564000000000000000000000000000000000000006060908152600090600160a060020a03838116919085169086907ff48843a143fb8a66d79a8afc8303d947d0ad97ffcd414214aedfa176c2f31c3c90602090a45060019392505050565b61004560005433600160a060020a039081169116146101f357610002565b6060908152602090f35b600054600160a060020a0316ff",
+    "updated_at": 1471476248354,
     "links": {},
     "address": "0xfcd44209cef70e9bba9d437c8395a856b84ab997"
   }

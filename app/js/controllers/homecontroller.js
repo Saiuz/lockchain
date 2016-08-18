@@ -15,10 +15,17 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	///////////////////////////////////////////////////////////////////////
 	$scope.accounts = AccountFactory.getAccounts();
 	$scope.defaultAccount = AccountFactory.getDefaultAccount();
-	$scope.selectedAccount = $scope.defaultAccount;
+	$scope.selectedAccount = AccountFactory.getSelectedAccount();
+
+	if(!$scope.selectedAccount){
+		AccountFactory.setSelectedAccount($scope.defaultAccount);
+		$scope.selectedAccount = $scope.defaultAccount;
+	}
+	
 	$scope.household=[];
 	getRegisteredForAccount($scope.selectedAccount);
 		
+
 	///////////////////////////////////////////////////////////////////////
 	// Load Data For Selected Account
 	///////////////////////////////////////////////////////////////////////
@@ -35,6 +42,7 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Reload Data For New Selected Account
 	///////////////////////////////////////////////////////////////////////
 	$scope.selectedAccountChanged = function(){
+		AccountFactory.setSelectedAccount($scope.selectedAccount);
 		getRegisteredForAccount($scope.selectedAccount);
 	}
 
@@ -43,7 +51,7 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Changes the Lock State From Locked To Unlocked or Vice Versa
 	///////////////////////////////////////////////////////////////////////
 	$scope.toggleLock = function(index){
-		if($scope.household[index].Locked){
+		if($scope.household[index].isLocked){
 			unlock(index); return
 		}
 		
@@ -55,10 +63,10 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Use the Lock Factory To Post the Locking Transaction
 	///////////////////////////////////////////////////////////////////////
 	function lock(index){
-		LockFactory.lock($scope.selectedAccount,$scope.household[index].Id, function(result){
+		LockFactory.lock($scope.selectedAccount,$scope.household[index].address, function(result){
 			$scope.$apply(function(){
-				$scope.household[index].Locked = true;
-				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].Locked);		
+				$scope.household[index].isLocked = true;
+				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].isLocked);		
 			});
 		});
 	};
@@ -68,10 +76,10 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	// Use the Lock Factory To Post the Unlocking Transaction
 	///////////////////////////////////////////////////////////////////////
 	function unlock(index){
-		LockFactory.unlock($scope.selectedAccount,$scope.household[index].Id, function(result){
+		LockFactory.unlock($scope.selectedAccount,$scope.household[index].address, function(result){
 			$scope.$apply(function(){
-				$scope.household[index].Locked = false;
-				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].Locked);
+				$scope.household[index].isLocked = false;
+				console.log("Change Lock State On " + $scope.household[index].Location + " to " + $scope.household[index].isLocked);
 			});
 		});
 	};

@@ -1,10 +1,9 @@
 <div class="jumbotron"> 
 </div>  
 <div class="container panel panel-default">  		
-	<h1>New Device</h1>
+	<h2>1. Add Device Details</h2>
 	<div class="row">
-		<div class="col-sm-3">
-			<h2>Add Description</h2>
+		<div class="col-sm-6">
 			
 			<label for="address">Address <small>(required)</small></label>
 			<input ng-model="device.address" type="text" id="address" name="address" placeholder="*Address" class="form-control" maxlength="32" readonly>
@@ -14,22 +13,47 @@
 			<input ng-model="device.title" type="text" id="title" name="title" placeholder="*Title" class="form-control" maxlength="32">
 			<p>
 			
-			<label for="model">Model <small>(required)</small></label>
-			<input ng-model="device.model" type="text" id="model" name="model" placeholder="*Model" class="form-control" maxlength="32">
-			<p>
-			
 			<label for="description">Description <small>(required)</small></label>
 			<input ng-model="device.description" type="text" id="description" name="description" placeholder="*Description" class="form-control" maxlength="32">
 			<p>
 
-			<input ng-model="device.isLocked" type="checkbox" id="isLocked" name="isLocked" value="isLocked" checked class="form-control"> Locked
-			<p>	
+			<label for="model">Model <small>(required)</small></label>
+			<input ng-model="device.model" type="text" id="model" name="model" placeholder="*Model" class="form-control" maxlength="32">
+			<p>
 		
-		</div>		
-		<div class="col-sm-1">
 		</div>
-		<div class="col-sm-8">
-			<h2>Grant Access To</h2>
+		<div class="col-sm-6">
+
+			<label for="manuafcturer">Manufacturer </label>
+			<input ng-model="device.manufacturer" type="text" id="manufacturer" name="manufacturer" placeholder="*Manufacturer" class="form-control" maxlength="32" readonly>
+			<p>
+
+			<label for="title">Installed Date </label>
+			<input ng-model="device.installed" type="text" id="installed" name="installed" placeholder="*Installed" class="form-control" maxlength="32" readonly>
+			<p>
+
+			<label class="custom-control custom-checkbox large">
+  				<input type="checkbox" class="custom-control-input" ng-model="device.isLocked">
+  				<span class="custom-control-indicator"></span>
+  				<span class="custom-control-description">Locked</span>
+			</label>
+			
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-10">
+		</div>
+		<div class="col-sm-2">
+			<button class="btn btn-success pull-right btn-block" ng-click="register()" role="button">Save</button>
+        </div>
+	</div>
+</div>	
+
+<div class="container panel panel-default">  		
+	<h2>2. Set Access Policy</h2>
+	
+	<div class="row">
+		<div class="col-sm-12">
 			<div class="table-responsive">
               <table class="table">
                 <thead>
@@ -41,19 +65,21 @@
                 <tbody>
                   <tr ng-repeat="grant in device.permissions">
                     <td>{{grant.name}}</td>
-                    <td>{{grant.startDate}}</td>
-                    <td>{{grant.endDate}}</td>
+                    <td><input type="date" ng-model="grant.startDate" class="form-control"/></td>
+                    <td><input type="date" ng-model="grant.endDate" class="form-control"/></td>
                     <td><button class="{{grant.grant ? 'btn btn-warning btn-block' : 'btn btn-primary btn-block'}}" ng-click="grantToUser($index)" role="button">{{grant.grant ? "Revoke" : "Grant"}}</button></td>
                   </tr>
                 </tbody>
               </table>
             </div>
-		</div>
-		
+		</div>		
 	</div>
+	
 	<div class="row">
-		<div class="col-sm-12">
-			<button class="btn btn-success pull-right" ng-click="register()" role="button">Register</button>
+		<div class="col-sm-10">
+		</div>
+		<div class="col-sm-2">
+			<button class="btn btn-success pull-right btn-block" ng-click="setPolicy()" role="button">Save</button>
         </div>
 	</div>
 </div>   

@@ -20,18 +20,22 @@ angular.module("LockChain").config(["$routeProvider", function($routeProvider) {
         templateUrl : "home.html",
         controller  : "HomeController"
       }).
-      when("/register/:accountId", {
+      when("/register/", {
         templateUrl : "register.html",
         controller  : "RegisterController"
       }).     
-      when("/details", {
-        templateUrl : "details.html",
-        controller  : "HomeController"
+      when("/details/:resource", {
+        templateUrl : "register.html",
+        controller  : "RegisterController"
       }).  
       when("/access", {
         templateUrl : "access.html",
         controller  : "HomeController"
-      }).     
+      }).
+      when("/trace", {
+        templateUrl : "trace.html",
+        controller  : "TraceController"
+      }).        
       otherwise({
         redirectTo: "/"
       });

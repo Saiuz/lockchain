@@ -13,6 +13,8 @@ contract TokenIssuer is Disposable{
     // Data structure for Iteration
     ////////////////////////////////////////////////////////////////////////////
     mapping(address=>address[]) subjectResources;
+    mapping(address=>address[]) resourceSubjects;
+    
     
     ////////////////////////////////////////////////////////////////////////////
     // Constructor Function
@@ -31,6 +33,7 @@ contract TokenIssuer is Disposable{
             token = new AccessToken(subject, resource, startDate, endDate);
             tokenStore[subject][resource] = token;
             subjectResources[subject].push(resource);
+            resourceSubjects[resource].push(subject);
         }
         else{
             token.Update(startDate,endDate);
@@ -50,7 +53,9 @@ contract TokenIssuer is Disposable{
         if(issuedTo == subject && issuedFor == resource){
             token.Kill();
             tokenStore[subject][resource] = AccessToken(0x0);
-            Remove(subject,resource);
+            RemoveResourceForSubject(subject,resource);
+            RemoveSubjectForResource(resource,subject);
+        
             result = true;
             return;
         }
@@ -72,15 +77,24 @@ contract TokenIssuer is Disposable{
     // Returns List Of Resources Addresses That Can Be Used In Conjunction
     // With GetToken
     ////////////////////////////////////////////////////////////////////////
-    function GetTokensFor(address subject) constant returns(address[] result){
+    function GetTokensForSubject(address subject) constant returns(address[] result){
         result=subjectResources[subject];
+    }
+    
+    ////////////////////////////////////////////////////////////////////////
+    // Get All The Resource Tokens Allocated To A Given Subject 
+    // Returns List Of Resources Addresses That Can Be Used In Conjunction
+    // With GetToken
+    ////////////////////////////////////////////////////////////////////////
+    function GetTokensForResource(address resource) constant returns(address[] result){
+        result=resourceSubjects[resource];
     }
     
     ////////////////////////////////////////////////////////////////////////
     // Helper Function To Remove An Element From The Subject Resource
     // Array Coresponsing To A Particular Resource For The Subject
     ////////////////////////////////////////////////////////////////////////
-    function Remove(address subject, address resource) private returns (address[] result){
+    function RemoveResourceForSubject(address subject, address resource) private returns (address[] result){
         
         address[] resourceItems = subjectResources[subject];
         
@@ -98,6 +112,30 @@ contract TokenIssuer is Disposable{
             }
         }
         result=subjectResources[subject];
-    }  
+    }
+    
+    ////////////////////////////////////////////////////////////////////////
+    // Helper Function To Remove An Element From The Subject Resource
+    // Array Coresponsing To A Particular Resource For The Subject
+    ////////////////////////////////////////////////////////////////////////
+    function RemoveSubjectForResource(address resource, address subject) private returns (address[] result){
+        
+        address[] subjectItems = resourceSubjects[resource];
+        
+        for(uint i=0; i < subjectItems.length; i++){
+            if(subjectItems[i]==subject){
+                for(uint j=i; j < subjectItems.length-1; j++){
+                    if(j+1 <= subjectItems.length-1){
+                       subjectItems[j]=subjectItems[j+1];
+                    }
+                }
+                delete subjectItems[subjectItems.length-1];
+                subjectItems.length--;
+                result=resourceSubjects[resource];
+                return;
+            }
+        }
+        result=resourceSubjects[resource];
+    }
     
 }

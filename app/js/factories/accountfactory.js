@@ -23,6 +23,7 @@ angular.module("LockChain").factory("AccountFactory", function(){
 					   "0xe8c426c019633e92ed5098337d85ca0b23bf09cb","0x86979663e818b23fd9367e65b01049a46a700517"]
 
 	var currentIndex = 5;
+	var selectedAccount;
 					   
 	///////////////////////////////////////////////////////////////////////////
 	// Function getAccounts
@@ -35,7 +36,7 @@ angular.module("LockChain").factory("AccountFactory", function(){
 	};
 
 	///////////////////////////////////////////////////////////////////////////
-	// Function Initialise
+	// Function getDefaultAccounts
 	///////////////////////////////////////////////////////////////////////////
 	// Gets The Initial Set of Accounts Configured On The Node Using 
 	// Account Factory As The Data Source. Default account is set as
@@ -44,6 +45,30 @@ angular.module("LockChain").factory("AccountFactory", function(){
 	var getDefaultAccount = function(callback){
 		return web3.eth.coinbase;
 	};
+
+	///////////////////////////////////////////////////////////////////////////
+	// Function getSelectedAccounts
+	///////////////////////////////////////////////////////////////////////////
+	// Gets The Initial Set of Accounts Configured On The Node Using 
+	// Account Factory As The Data Source. Default account is set as
+	// The accounts[0] Coinbase
+	///////////////////////////////////////////////////////////////////////////
+	var getSelectedAccount = function(){
+		return selectedAccount;
+	};
+
+	///////////////////////////////////////////////////////////////////////////
+	// Function getSelectedAccounts
+	///////////////////////////////////////////////////////////////////////////
+	// Gets The Initial Set of Accounts Configured On The Node Using 
+	// Account Factory As The Data Source. Default account is set as
+	// The accounts[0] Coinbase
+	///////////////////////////////////////////////////////////////////////////
+	var setSelectedAccount = function(account){
+		selectedAccount=account;
+	};
+
+
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function getNextDeviceAddress
@@ -59,7 +84,9 @@ angular.module("LockChain").factory("AccountFactory", function(){
 	return{
 		getAccounts: getAccounts,
 		getDefaultAccount:getDefaultAccount,
-		getNextDeviceAddress:getNextDeviceAddress
+		getNextDeviceAddress:getNextDeviceAddress,
+		getSelectedAccount:getSelectedAccount,
+		setSelectedAccount:setSelectedAccount
 	};
 
 });

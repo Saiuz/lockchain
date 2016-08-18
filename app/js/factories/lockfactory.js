@@ -48,8 +48,8 @@ angular.module("LockChain").factory("LockFactory", function(){
 		.then(function(result){
 			callback(result);
 		})
-		.catch(function(e){
-			console.log(e);
+		.catch(function(error){
+			console.log(error);
 		});
 	};
 
@@ -72,7 +72,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 		
 		var deviceList = [];
 		var promises = [];
-		accessContract.GetTokensFor(account)
+		accessContract.GetTokensForSubject(account)
 		.then(function(result){
 			for(i=0; i<result.length;i++){
 				deviceList.push({address:result[i]});
@@ -100,6 +100,30 @@ angular.module("LockChain").factory("LockFactory", function(){
 	};
 
 	///////////////////////////////////////////////////////////////////////////
+	// Function Export getResource
+	// Returns a previously created device at a specified adddess
+    ///////////////////////////////////////////////////////////////////////////
+	// Parameters
+	// account 	: resource account to retrieve
+	// callback : function to execute when done
+	///////////////////////////////////////////////////////////////////////////
+	var getResource = function(resource, callback){
+		lockContract.lockAttrs(resource)
+		.then(function(data){
+			device={};
+			device.address=resource;
+			device.title=web3.toAscii(data[0]);
+			device.model=web3.toAscii(data[1]);
+			device.description=web3.toAscii(data[2]);
+			device.isLocked=data[3];
+			callback(device);
+		})
+		.catch(function(error){
+			console.log(error);
+		});
+	}
+
+	///////////////////////////////////////////////////////////////////////////
 	// Function Pointer Lock
 	// Locks the Specified Resource by posting a trnsaction on the blockchain
 	///////////////////////////////////////////////////////////////////////////
@@ -113,8 +137,8 @@ angular.module("LockChain").factory("LockFactory", function(){
 		.then(function(response){
 			callback(response);
 		})
-		.catch(function(e){
-			console.log(e);
+		.catch(function(error){
+			console.log(error);
 		});
 	};
 
@@ -132,8 +156,8 @@ angular.module("LockChain").factory("LockFactory", function(){
 		.then(function(response){
 			callback(response);
 		})
-		.catch(function(e){
-			console.log(e);
+		.catch(function(error){
+			console.log(error);
 		});
 	};
 
@@ -141,6 +165,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 		register:register,
 		transfer:transfer,
 		getRegisteredForAccount:getRegisteredForAccount,
+		getResource:getResource,
 		lock: lock,
 		unlock:unlock
 	};

@@ -9,7 +9,7 @@ module.exports = {
     "details.html":"details.html",
     "access.html" : "access.html",
     "register.html" : "register.html",
-    
+    "trace.html" : "trace.html",
     
     ////////////////////////////////////////////////////////////////////////////////////
     // Concatenate and Copy js/app.js to app.js in the build folder
@@ -25,6 +25,7 @@ module.exports = {
          "js/controllers/eventcontroller.js",
          "js/controllers/homecontroller.js",
          "js/controllers/registercontroller.js",
+         "js/controllers/tracecontroller.js",
          "js/factories/accountfactory.js",
          "js/factories/eventfactory.js",
          "js/factories/policyfactory.js",
