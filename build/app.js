@@ -46962,8 +46962,8 @@ module.exports = {
   "LockAPI": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js"),
   "LockAPIBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPIBase.sol.js"),
   "LogService": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js"),
-  "Migrations": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js"),
   "PolicyDecision": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecision.sol.js"),
+  "Migrations": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js"),
   "PolicyDecisionBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecisionBase.sol.js"),
   "TokenIssuer": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/TokenIssuer.sol.js"),
 };
@@ -48029,8 +48029,17 @@ angular.module("LockChain").factory("AccountFactory", function(){
 	// already have addresses allocated by the manufacturer
 	///////////////////////////////////////////////////////////////////////////
 	var getNextDeviceAddress = function(){
-		return addressList[currentIndex++];
+		return generateDummyAddress();
 	};
+
+	function generateDummyAddress(){
+		var x=(Math.random()*100000000000000000).toString();
+		var y=(Math.random()*100000000000000000).toString();
+		var z=(Math.random()*100000000000000000).toString();
+		var concatenated = x+y+z;
+		concatenated = concatenated.substring(0,40);
+		return "0x" + concatenated
+	}
 
 	return{
 		getAccounts: getAccounts,
