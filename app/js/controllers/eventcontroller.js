@@ -20,7 +20,6 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 
 	var eventWatcher;
 	startEventWatch();
-	//$scope.eventStatus = $scope.watchStatus.NotWatching;
 	$scope.eventLog = getEventLog({});
 
 
@@ -121,7 +120,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 					$scope.eventStatus = $scope.watchStatus.Received + " " + result.event;
 		        	$scope.event = result;
 		        	$rootScope.$broadcast("OnStatusChanged",{event:result.event});
-		        	getEventLog({})
+		        	getEventLog({});
 		        	 
 		        });
 			}
