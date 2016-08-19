@@ -47147,7 +47147,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[Disposable,AccessToken,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -48010,6 +48010,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	$scope.accounts = AccountFactory.getAccounts();
 	$scope.defaultAccount = AccountFactory.getDefaultAccount();
 	$scope.selectedAccount=AccountFactory.getSelectedAccount();
+	if(!$scope.selectedAccount) $scope.selectedAccount=$scope.defaultAccount;
 	$scope.device={};
 	$scope.device.permissions=[];
 	if($routeParams.resource){

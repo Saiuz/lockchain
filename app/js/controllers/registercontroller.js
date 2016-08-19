@@ -11,6 +11,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	$scope.accounts = AccountFactory.getAccounts();
 	$scope.defaultAccount = AccountFactory.getDefaultAccount();
 	$scope.selectedAccount=AccountFactory.getSelectedAccount();
+	if(!$scope.selectedAccount) $scope.selectedAccount=$scope.defaultAccount;
 	$scope.device={};
 	$scope.device.permissions=[];
 	if($routeParams.resource){
