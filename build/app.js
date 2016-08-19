@@ -47282,7 +47282,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[AccessToken,Disposable,LockAPIBase,LockAPI,LogService,Migrations,PolicyDecisionBase,PolicyDecision,TokenIssuer].forEach(function(contract) {         
+[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -47950,7 +47950,9 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 					console.log("Received Event Notification");
 					$scope.eventStatus = $scope.watchStatus.Received + " " + result.event;
 		        	$scope.event = result;
-		        	getEventLog({});
+		        	$rootScope.$broadcast("OnStatusChanged",{event:result.event});
+		        	getEventLog({})
+		        	 
 		        });
 			}
 			else{
@@ -48034,6 +48036,16 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 		
 		lock(index);
 	};
+
+	///////////////////////////////////////////////////////////////////////
+	// Event Broadcast Receiver
+	// Notified Page That A Lock Status Update has Been Reecived
+	///////////////////////////////////////////////////////////////////////
+	$scope.$on("OnStatusChanged", function(event, args) {
+		if(args.event != "AccessDenied" && args.event != "AccessGranted"){
+			getRegisteredForAccount($scope.selectedAccount);
+		}
+	});
 
 	///////////////////////////////////////////////////////////////////////
 	// Function Lock

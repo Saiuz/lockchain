@@ -61,6 +61,16 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	};
 
 	///////////////////////////////////////////////////////////////////////
+	// Event Broadcast Receiver
+	// Notified Page That A Lock Status Update has Been Reecived
+	///////////////////////////////////////////////////////////////////////
+	$scope.$on("OnStatusChanged", function(event, args) {
+		if(args.event != "AccessDenied" && args.event != "AccessGranted"){
+			getRegisteredForAccount($scope.selectedAccount);
+		}
+	});
+
+	///////////////////////////////////////////////////////////////////////
 	// Function Lock
 	// Use the Lock Factory To Post the Locking Transaction
 	///////////////////////////////////////////////////////////////////////

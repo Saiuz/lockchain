@@ -120,7 +120,9 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 					console.log("Received Event Notification");
 					$scope.eventStatus = $scope.watchStatus.Received + " " + result.event;
 		        	$scope.event = result;
-		        	getEventLog({});
+		        	$rootScope.$broadcast("OnStatusChanged",{event:result.event});
+		        	getEventLog({})
+		        	 
 		        });
 			}
 			else{
