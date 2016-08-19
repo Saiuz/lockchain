@@ -47282,7 +47282,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[AccessToken,LockAPI,LockAPIBase,Disposable,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[AccessToken,Disposable,LockAPIBase,LockAPI,LogService,Migrations,PolicyDecisionBase,PolicyDecision,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -47848,9 +47848,11 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		Received: "Received New Event"
 	};
 
-	$scope.eventStatus = $scope.watchStatus.NotWatching;
-	$scope.eventLog = getEventLog({});
 	var eventWatcher;
+	startEventWatch();
+	//$scope.eventStatus = $scope.watchStatus.NotWatching;
+	$scope.eventLog = getEventLog({});
+
 
 	///////////////////////////////////////////////////////////////////////
 	// Toggle Blockchain Event Trace

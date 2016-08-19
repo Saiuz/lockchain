@@ -18,9 +18,11 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		Received: "Received New Event"
 	};
 
-	$scope.eventStatus = $scope.watchStatus.NotWatching;
-	$scope.eventLog = getEventLog({});
 	var eventWatcher;
+	startEventWatch();
+	//$scope.eventStatus = $scope.watchStatus.NotWatching;
+	$scope.eventLog = getEventLog({});
+
 
 	///////////////////////////////////////////////////////////////////////
 	// Toggle Blockchain Event Trace
