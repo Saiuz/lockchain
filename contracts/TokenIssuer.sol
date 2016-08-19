@@ -1,5 +1,6 @@
-import "./AccessToken.sol";
 import "./Disposable.sol";
+import "./AccessToken.sol";
+import "./LogService.sol";
 
 contract TokenIssuer is Disposable{
     
@@ -15,11 +16,17 @@ contract TokenIssuer is Disposable{
     mapping(address=>address[]) subjectResources;
     mapping(address=>address[]) resourceSubjects;
     
+    ////////////////////////////////////////////////////////////////////////////
+    // Logging Service
+    ////////////////////////////////////////////////////////////////////////////
+    LogService logger;
     
     ////////////////////////////////////////////////////////////////////////////
     // Constructor Function
     ////////////////////////////////////////////////////////////////////////////
-    function TokenIssuer(){}
+    function TokenIssuer(LogService logService){
+        logger = logService;
+    }
     
     ////////////////////////////////////////////////////////////////////////
     // If Access Token Contract Already Exists Edit It
@@ -38,6 +45,7 @@ contract TokenIssuer is Disposable{
         else{
             token.Update(startDate,endDate);
         }
+        logger.LogPolicyGranted("Policy",subject,resource,msg.sender,"Policy Granted");
         result = token;
     }
     
@@ -55,7 +63,7 @@ contract TokenIssuer is Disposable{
             tokenStore[subject][resource] = AccessToken(0x0);
             RemoveResourceForSubject(subject,resource);
             RemoveSubjectForResource(resource,subject);
-        
+            logger.LogPolicyRevoked("Policy",subject,resource,msg.sender,"Policy Revoked");
             result = true;
             return;
         }

@@ -7,11 +7,11 @@ module.exports = function(deployer) {
 
 
   	deployer.deploy(LogService).then(function(){
-  		return deployer.deploy(TokenIssuer);
+  		return deployer.deploy(TokenIssuer,LogService.address);
   	}).then(function(){
   		return deployer.deploy(PolicyDecision, TokenIssuer.address, LogService.address);
   	}).then(function(){
-  		return deployer.deploy(LockAPI, PolicyDecision.address,LogService.address);		
+  		return deployer.deploy(LockAPI, PolicyDecision.address, LogService.address);		
   	});
   	
 
