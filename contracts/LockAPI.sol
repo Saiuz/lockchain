@@ -3,14 +3,19 @@ import "./PolicyDecision.sol";
 
 contract LockAPIBase is Disposable{
     
+    uint8 DEMAND_ACCESS_0 = 0;
+    uint8 DEMAND_ACCESS_1 = 1;
+    uint8 DEMAND_ACCESS_2 = 2;
+    uint8 DEMAND_ACCESS_3 = 3;
+    
     PolicyDecisionBase policyDecisionPoint;
     LogService logger;
     
     ////////////////////////////////////////////////////////////////////////////
     // Policy Enforcement Points
     ////////////////////////////////////////////////////////////////////////////
-    modifier requireAuthorisation(address subject, address resource){ 
-       bool isAuthorised = policyDecisionPoint.IsAuthorised(subject, resource);
+    modifier requireAuthorisation(address subject, address resource, uint8 accessRequired){ 
+       bool isAuthorised = policyDecisionPoint.IsAuthorised(subject, resource, accessRequired);
        if(!isAuthorised) { return; } _
     }
     
@@ -81,7 +86,7 @@ contract LockAPI is LockAPIBase(){
         result = true;
     }
     
-    function Transfer(address identity, address newOwner) returns (bool result){
+    function Transfer(address identity, address newOwner) requireAuthorisation(msg.sender, identity, DEMAND_ACCESS_2) returns (bool result){
         address oldOwner = lockOwner[identity];
         lockOwner[identity] = newOwner;
         ownerLock[newOwner].push(identity);
@@ -110,14 +115,14 @@ contract LockAPI is LockAPIBase(){
     
     }
     
-    function Lock(address resource) requireAuthorisation(msg.sender, resource) returns (bool result){
+    function Lock(address resource) requireAuthorisation(msg.sender, resource, DEMAND_ACCESS_1) returns (bool result){
         identityAttributes storage record = lockAttrs[resource];
         record.isLocked=true;
         logger.LogLocked("LockAPI",msg.sender,resource,"Locked Successfully");
         result=true;
     }
     
-    function Unlock(address resource) requireAuthorisation(msg.sender, resource) returns (bool result){
+    function Unlock(address resource) requireAuthorisation(msg.sender, resource, DEMAND_ACCESS_1) returns (bool result){
         identityAttributes storage record = lockAttrs[resource];
         record.isLocked=false;
         logger.LogUnlocked("LockAPI",msg.sender,resource,"Unlocked Successfully");

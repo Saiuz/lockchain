@@ -338,6 +338,31 @@ var Web3 = require("web3");
       },
       {
         "constant": true,
+        "inputs": [
+          {
+            "name": "subject",
+            "type": "address"
+          },
+          {
+            "name": "resource",
+            "type": "address"
+          },
+          {
+            "name": "required",
+            "type": "uint8"
+          }
+        ],
+        "name": "IsAuthorised",
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      },
+      {
+        "constant": true,
         "inputs": [],
         "name": "getIssuer",
         "outputs": [
@@ -374,27 +399,6 @@ var Web3 = require("web3");
           }
         ],
         "name": "setLogger",
-        "outputs": [
-          {
-            "name": "result",
-            "type": "bool"
-          }
-        ],
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "subject",
-            "type": "address"
-          },
-          {
-            "name": "resource",
-            "type": "address"
-          }
-        ],
-        "name": "IsAuthorised",
         "outputs": [
           {
             "name": "result",
@@ -448,8 +452,8 @@ var Web3 = require("web3");
         "type": "constructor"
       }
     ],
-    "unlinked_binary": "0x606060408181528061019c833960a09052516080516000805433600160a060020a03199182161782556001805482169094179093556002805490931690911790915561014c90819061005090396000f36060604052361561006c5760e060020a60003504631d143848811461006e578063525564211461008057806355cc4e57146100a05780635722e24a146100ce5780637683706f146100f6578063be26733c146100fd578063d0b04e391461011b578063f24ccbfe1461012c575b005b61008d600154600160a060020a031681565b600154600160a060020a03165b600160a060020a03166060908152602090f35b6001805473ffffffffffffffffffffffffffffffffffffffff19166004351781555b15156060908152602090f35b6002805473ffffffffffffffffffffffffffffffffffffffff191660043517905560016100c2565b60006100c2565b61006c60005433600160a060020a0390811691161461013e57610002565b600254600160a060020a031661008d565b61008d600254600160a060020a031681565b600054600160a060020a0316ff",
-    "updated_at": 1471602110420,
+    "unlinked_binary": "0x606060408181528061019c833960a09052516080516000805433600160a060020a03199182161782556001805482169094179093556002805490931690911790915561014c90819061005090396000f36060604052361561006c5760e060020a60003504631d143848811461006e57806334abd2d614610080578063525564211461008f57806355cc4e57146100af5780635722e24a146100d5578063be26733c146100fd578063d0b04e391461011b578063f24ccbfe1461012c575b005b61009c600154600160a060020a031681565b60005b15156060908152602090f35b600154600160a060020a03165b600160a060020a03166060908152602090f35b6001805473ffffffffffffffffffffffffffffffffffffffff1916600435178155610083565b6002805473ffffffffffffffffffffffffffffffffffffffff19166004351790556001610083565b61006c60005433600160a060020a0390811691161461013e57610002565b600254600160a060020a031661009c565b61009c600254600160a060020a031681565b600054600160a060020a0316ff",
+    "updated_at": 1471626444660,
     "links": {}
   }
 };

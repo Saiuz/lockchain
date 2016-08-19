@@ -34,7 +34,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 						policyList[index].startDateString="";
 						policyList[index].endDateString="";
 						policyList[index].startDate=0;
-						policyList[index].endDate=0;;
+						policyList[index].endDate=0;
 
 						if(data[2] > 0){
 							startDate = new Date(data[2]*1000);
@@ -46,6 +46,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 							policyList[index].endDate=endDate;
 							policyList[index].endDateString=endDate.toString("yyyy-MM-dd");
 						}
+						policyList[index].access=data[4].toString();
 						index++;
 					});
 
@@ -78,7 +79,8 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 			if(item.grant){
 				var startDate = dateToUnixTimestamp(item.startDate);
 				var endDate = dateToUnixTimestamp(item.endDate);
-				promises.push(tokenContract.Grant(item.name, resource.address, startDate, endDate,{from:account}));
+				var access  = item.access;
+				promises.push(tokenContract.Grant(item.name, resource.address, startDate, endDate, access, {from:account}));
 			}
 		}
 
@@ -109,9 +111,10 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		var subject = permission.name;
 		var startDate = dateToUnixTimestamp(permission.startDate);
 		var endDate = dateToUnixTimestamp(permission.endDate);
+		var access  = permission.access;
 
 		var promise =
-			tokenContract.Grant(subject,resource,startDate,endDate, {from:account})
+			tokenContract.Grant(subject,resource,startDate,endDate, access,{from:account})
 			.then(function(result){
 				return result;
 			})

@@ -12,6 +12,9 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	$scope.defaultAccount = AccountFactory.getDefaultAccount();
 	$scope.selectedAccount=AccountFactory.getSelectedAccount();
 	if(!$scope.selectedAccount) $scope.selectedAccount=$scope.defaultAccount;
+	
+	$scope.accessLevels=["None","User","Admin"];
+
 	$scope.device={};
 	$scope.device.permissions=[];
 	if($routeParams.resource){
@@ -24,6 +27,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		$scope.pageTitle="1. Add Device Details";
 		initialisefromEmpty();
 	} 
+
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Function InitialiseFromEmpty
@@ -40,8 +44,10 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		$scope.device.isLocked=true;
 
 		for(i=0; i < $scope.accounts.length; i++){
-			var grantFor = ($scope.accounts[i]==$scope.selectedAccount)
-			var permission = {name:$scope.accounts[i],startDate:0, endDate:0,startDateString:"",endDateString:"", grant:grantFor};
+			var grantFor = ($scope.accounts[i]==$scope.selectedAccount);
+			var level = ($scope.accounts[i]==$scope.selectedAccount ? 2 : 0);
+			var access = $scope.accessLevels[level];
+			var permission = {name:$scope.accounts[i],startDate:0, endDate:0,startDateString:"",endDateString:"", access:level, grant:grantFor};
 			$scope.device.permissions[i] = permission;					
 		}
 
@@ -62,14 +68,15 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			.then(function(result){
 				var permissions = []
 				for(i=0; i < $scope.accounts.length; i++){
-					permission = {name:$scope.accounts[i],startDate:0,endDate:0,startDateString:"",endDateString:"", grant:false};
+					permission = {name:$scope.accounts[i],startDate:0,endDate:0,startDateString:"",endDateString:"", access: 0, grant:false};
 					for(j=0; j < result.length; j++){
 						if(result[j].issuedTo == $scope.accounts[i]){
 							startDate=result[j].startDate;
 							endDate = result[j].endDate;
 							startDateString=result[j].startDateString;
 							endDateString=result[j].endDateString;
-							permission = {name:result[j].issuedTo,startDate:startDate,endDate:endDate, startDateString:startDateString, endDateString:endDateString, grant:true};
+							access = parseInt(result[j].access);
+							permission = {name:result[j].issuedTo,startDate:startDate,endDate:endDate, startDateString:startDateString, endDateString:endDateString, access:access, grant:true};
 							break;	
 						}
 					}
@@ -163,6 +170,8 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 				$scope.device.permissions[index].endDate=0;
 				$scope.device.permissions[index].startDateString="";
 				$scope.device.permissions[index].endDateString="";
+				$scope.device.permissions[index].access=0;
+				
 			});
 			console.log(result);
 		})

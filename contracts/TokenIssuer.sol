@@ -33,17 +33,17 @@ contract TokenIssuer is Disposable{
     // Otherwise Create a New Contract and Store It In The Mapping
     // Add The Resource Address To The List Of Subject Resources
     ////////////////////////////////////////////////////////////////////////
-    function Grant(address subject, address resource, uint startDate, uint endDate) returns (address result){
+    function Grant(address subject, address resource, uint startDate, uint endDate, uint8 access) returns (address result){
     
         AccessToken token = AccessToken(tokenStore[subject][resource]);
         if(address(token)==0x0){
-            token = new AccessToken(subject, resource, startDate, endDate);
+            token = new AccessToken(subject, resource, startDate, endDate, access);
             tokenStore[subject][resource] = token;
             subjectResources[subject].push(resource);
             resourceSubjects[resource].push(subject);
         }
         else{
-            token.Update(startDate,endDate);
+            token.Update(startDate,endDate, access);
         }
         logger.LogPolicyGranted("Policy",subject,resource,msg.sender,"Policy Granted");
         result = token;
@@ -57,7 +57,7 @@ contract TokenIssuer is Disposable{
     function Revoke(address subject, address resource) returns (bool result){
         AccessToken token = AccessToken(tokenStore[subject][resource]);
         if(address(token)==0x0) return false;
-        var (issuedTo, issuedFor, startDate, endDate) = token.Serialize();
+        var (issuedTo, issuedFor, startDate, endDate, access) = token.Serialize();
         if(issuedTo == subject && issuedFor == resource){
             token.Kill();
             tokenStore[subject][resource] = AccessToken(0x0);
@@ -74,10 +74,10 @@ contract TokenIssuer is Disposable{
     // Serialise the access token allocated to the given subject for 
     // the given Resource
     ////////////////////////////////////////////////////////////////////////
-    function GetToken(address subject, address resource) constant returns (address issuedTo, address issuedFor, uint startDate, uint endDate){
+    function GetToken(address subject, address resource) constant returns (address issuedTo, address issuedFor, uint startDate, uint endDate, uint access){
         AccessToken token = AccessToken(tokenStore[subject][resource]);
         if(address(token)==0x0) return;
-        (issuedTo, issuedFor, startDate, endDate) = token.Serialize();
+        (issuedTo, issuedFor, startDate, endDate, access) = token.Serialize();
     }
     
     ////////////////////////////////////////////////////////////////////////
@@ -147,3 +147,4 @@ contract TokenIssuer is Disposable{
     }
     
 }
+

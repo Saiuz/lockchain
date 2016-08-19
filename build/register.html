@@ -64,6 +64,7 @@
               <table class="table">
                 <thead>
                   <td><strong>Name</strong></td>
+                  <td><strong>Level</strong></td>
                   <td><strong>Start Date</strong></td>
                   <td><strong>End Date</strong></td>
                   <td><strong></strong></td>
@@ -71,6 +72,11 @@
                 <tbody>
                   <tr ng-repeat="grant in device.permissions">
                     <td>{{grant.name}}</td>
+                    <td><!--<select id="accessLevel" class="form-control" ng-model="grant.access" 
+                  				ng-options="item for item in accessLevels"/>-->
+
+                  		<select class="form-control" ng-model="grant.access" ng-options="accessLevels.indexOf(access) as access for access in accessLevels"></select>
+          			</td>
                     <td><input type="date" ng-model="grant.startDate" value="{{grant.startDateString}}" class="form-control"/></td>
                     <td><input type="date" ng-model="grant.endDate" value="{{grant.endDateString}}"class="form-control"/></td>
                     <td><button class="{{grant.grant ? 'btn btn-warning btn-block' : 'btn btn-primary btn-block'}}" ng-click="grantToUser($index)" role="button">{{grant.grant ? "Revoke" : "Grant"}}</button></td>

@@ -2,7 +2,6 @@ import "./TokenIssuer.sol";
 import "./LogService.sol";
 import "./Disposable.sol";
 
-
 contract PolicyDecisionBase is Disposable{
     
     TokenIssuer public issuer;
@@ -31,7 +30,7 @@ contract PolicyDecisionBase is Disposable{
         logService = logger;
     }
     
-    function IsAuthorised(address subject, address resource) constant returns (bool result){}
+    function IsAuthorised(address subject, address resource, uint8 required) constant returns (bool result){}
 
 }
 
@@ -39,10 +38,14 @@ contract PolicyDecision is PolicyDecisionBase(){
     
     function PolicyDecision(TokenIssuer accessIssuer, LogService logService) PolicyDecisionBase(accessIssuer,logService){}
     
-    function IsAuthorised(address subject, address resource) constant returns (bool result){
+    function IsAuthorised(address subject, address resource, uint8 required) constant returns (bool result){
         
-        var (issuedTo, issuedFor, startDate, endDate) = issuer.GetToken(subject,resource);
+        var (issuedTo, issuedFor, startDate, endDate, access) = issuer.GetToken(subject,resource);
         if(issuedTo != subject || issuedFor != resource){
+            logger.LogAccessDenied("PDP",subject,resource);
+            return false;
+        }
+        if(access < required){
             logger.LogAccessDenied("PDP",subject,resource);
             return false;
         }
@@ -58,3 +61,4 @@ contract PolicyDecision is PolicyDecisionBase(){
         return true;
     }
 }
+
