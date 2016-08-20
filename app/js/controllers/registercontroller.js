@@ -62,6 +62,46 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	function initialisefromData(resource){
 
 		LockFactory.getResource(resource)
+			.then(function(device){
+				console.log(device);
+				var promise = PolicyFactory.getPolicyForResource(resource);
+				return promise;
+			})
+			.then(function(result){
+				console.log(result);
+				var promises = []; var policyList = [];
+				for(i=0; i<result.length;i++){
+					policyList.push({subject:result[i]});
+					promises.push(PolicyFactory.getToken(result[i],resource));
+				}
+				return Promise.all(promises);
+			})
+			.then(function(result){
+				console.log(result);
+				var permissions = []
+				for(i=0; i < $scope.accounts.length; i++){
+					permission = {name:$scope.accounts[i],startDate:0,endDate:0,startDateString:"",endDateString:"", access: 0, grant:false};
+					for(j=0; j < result.length; j++){
+						if(result[j].issuedTo == $scope.accounts[i]){
+							result[j].grant=true;
+							permission=result[j];
+							break; 	
+						}
+					}
+					permissions[i] = permission;
+				}
+				device.permissions=permissions;
+				$scope.$apply(function(){
+					$scope.device = device;
+				});
+			});
+
+	}
+
+
+	/*function initialisefromData(resource){
+
+		LockFactory.getResource(resource)
 		.then(function(data){
 			console.log(data);
 			PolicyFactory.getPolicy(resource)
@@ -90,7 +130,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			});
 
 		});
-	}
+	}*/
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Register

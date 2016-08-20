@@ -9,6 +9,16 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	
 	var tokenContract = TokenIssuer.deployed();
 
+	var getPolicyForResource = function(resource){
+		var promise =
+			tokenContract.GetTokensForResource(resource)
+			.then(function(result){
+				return result;
+			});
+
+		return promise;
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// GetPolicy
 	///////////////////////////////////////////////////////////////////////////
@@ -16,7 +26,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	// Policy Describes What Each Subject Can Do Against The Resource
 	// Returns Array of Policy Objects Via Callback
 	///////////////////////////////////////////////////////////////////////////
-	var getPolicy = function(resource){
+	/*var getPolicy = function(resource){
 
 		var promise =
 			tokenContract.GetTokensForResource(resource)
@@ -60,7 +70,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 			});
 			return promise;
 
-	};
+	};*/
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -150,6 +160,32 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		
 	}
 
+	var getToken = function(account, resource){
+		var promise =
+			tokenContract.GetToken(account,resource,{from:account})
+			.then(function(data){
+				var token={name:account,startDate:0,endDate:0,startDateString:"",endDateString:""};
+				token.issuedTo = data[0];
+				token.issuedFor= data[1];
+				if(data[2] > 0){
+					startDate = new Date(data[2]*1000);
+					token.startDate=startDate;
+					token.startDateString=startDate.toString("yyyy-MM-dd");
+				}
+				if(data[3] > 0){
+					endDate = new Date(data[3]*1000);
+					token.endDate=endDate;
+					token.endDateString=endDate.toString("yyyy-MM-dd");
+				}
+				token.access=parseInt(data[4].toString());
+				return token;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// dateToUnixTimestamp
 	///////////////////////////////////////////////////////////////////////////
@@ -169,10 +205,12 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	}
 
 	return{
-		getPolicy:getPolicy,
+		//getPolicy:getPolicy,
 		setPolicy:setPolicy,
 		grant:grant,
-		revoke:revoke
+		revoke:revoke,
+		getPolicyForResource:getPolicyForResource,
+		getToken:getToken
 	};
 
 });

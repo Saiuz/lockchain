@@ -47348,10 +47348,10 @@ module.exports = {
   "Disposable": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Disposable.sol.js"),
   "LockAPI": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js"),
   "LockAPIBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPIBase.sol.js"),
-  "Migrations": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js"),
   "LogService": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js"),
-  "PolicyDecisionBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecisionBase.sol.js"),
+  "Migrations": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js"),
   "PolicyDecision": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecision.sol.js"),
+  "PolicyDecisionBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecisionBase.sol.js"),
   "TokenIssuer": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/TokenIssuer.sol.js"),
 };
 },{"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/AccessToken.sol.js":1,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Disposable.sol.js":2,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js":3,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPIBase.sol.js":4,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js":5,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js":6,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecision.sol.js":7,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecisionBase.sol.js":8,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/TokenIssuer.sol.js":9}]},{},[227])(227)
@@ -48312,6 +48312,46 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	function initialisefromData(resource){
 
 		LockFactory.getResource(resource)
+			.then(function(device){
+				console.log(device);
+				var promise = PolicyFactory.getPolicyForResource(resource);
+				return promise;
+			})
+			.then(function(result){
+				console.log(result);
+				var promises = []; var policyList = [];
+				for(i=0; i<result.length;i++){
+					policyList.push({subject:result[i]});
+					promises.push(PolicyFactory.getToken(result[i],resource));
+				}
+				return Promise.all(promises);
+			})
+			.then(function(result){
+				console.log(result);
+				var permissions = []
+				for(i=0; i < $scope.accounts.length; i++){
+					permission = {name:$scope.accounts[i],startDate:0,endDate:0,startDateString:"",endDateString:"", access: 0, grant:false};
+					for(j=0; j < result.length; j++){
+						if(result[j].issuedTo == $scope.accounts[i]){
+							result[j].grant=true;
+							permission=result[j];
+							break; 	
+						}
+					}
+					permissions[i] = permission;
+				}
+				device.permissions=permissions;
+				$scope.$apply(function(){
+					$scope.device = device;
+				});
+			});
+
+	}
+
+
+	/*function initialisefromData(resource){
+
+		LockFactory.getResource(resource)
 		.then(function(data){
 			console.log(data);
 			PolicyFactory.getPolicy(resource)
@@ -48340,7 +48380,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			});
 
 		});
-	}
+	}*/
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Register
@@ -48655,6 +48695,16 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	
 	var tokenContract = TokenIssuer.deployed();
 
+	var getPolicyForResource = function(resource){
+		var promise =
+			tokenContract.GetTokensForResource(resource)
+			.then(function(result){
+				return result;
+			});
+
+		return promise;
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// GetPolicy
 	///////////////////////////////////////////////////////////////////////////
@@ -48662,7 +48712,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	// Policy Describes What Each Subject Can Do Against The Resource
 	// Returns Array of Policy Objects Via Callback
 	///////////////////////////////////////////////////////////////////////////
-	var getPolicy = function(resource){
+	/*var getPolicy = function(resource){
 
 		var promise =
 			tokenContract.GetTokensForResource(resource)
@@ -48706,7 +48756,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 			});
 			return promise;
 
-	};
+	};*/
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -48796,6 +48846,32 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		
 	}
 
+	var getToken = function(account, resource){
+		var promise =
+			tokenContract.GetToken(account,resource,{from:account})
+			.then(function(data){
+				var token={name:account,startDate:0,endDate:0,startDateString:"",endDateString:""};
+				token.issuedTo = data[0];
+				token.issuedFor= data[1];
+				if(data[2] > 0){
+					startDate = new Date(data[2]*1000);
+					token.startDate=startDate;
+					token.startDateString=startDate.toString("yyyy-MM-dd");
+				}
+				if(data[3] > 0){
+					endDate = new Date(data[3]*1000);
+					token.endDate=endDate;
+					token.endDateString=endDate.toString("yyyy-MM-dd");
+				}
+				token.access=parseInt(data[4].toString());
+				return token;
+			})
+			.catch(function(error){
+				console.log(error);
+			});
+		return promise;
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	// dateToUnixTimestamp
 	///////////////////////////////////////////////////////////////////////////
@@ -48815,10 +48891,12 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	}
 
 	return{
-		getPolicy:getPolicy,
+		//getPolicy:getPolicy,
 		setPolicy:setPolicy,
 		grant:grant,
-		revoke:revoke
+		revoke:revoke,
+		getPolicyForResource:getPolicyForResource,
+		getToken:getToken
 	};
 
 });
