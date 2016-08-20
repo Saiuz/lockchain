@@ -29,7 +29,7 @@ angular.module("LockChain").factory("LockFactory", function(){
 		console.log("REGISTER FACTORY ABOUT TO SAVE");
 		console.log(resource);	
 
-		var promise = lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account,gas:1000000})
+		var promise = lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account})
 		.then(function(result){
 			return result;
 		})

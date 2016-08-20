@@ -38,6 +38,7 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 			});
 		});
 	}
+	
 
 	///////////////////////////////////////////////////////////////////////
 	// Handle Selected Account Changed Event

@@ -5,7 +5,7 @@
 // LD042 Advanced Web Engineering
 // Andrew Hall 2016
 ///////////////////////////////////////////////////////////////////////////////
-angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","$location", "LockFactory", "AccountFactory", "PolicyFactory", function($scope,$routeParams,$location,LockFactory,AccountFactory,PolicyFactory){
+angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","$location", "LockFactory", "AccountFactory", "PolicyFactory", "EventFactory", function($scope,$routeParams,$location,LockFactory,AccountFactory,PolicyFactory,EventFactory){
 
 	console.log("Entered RegisterController");
 	$scope.accounts = AccountFactory.getAccounts();
@@ -28,6 +28,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		initialisefromEmpty();
 	} 
 
+	var eventWatcher;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Function InitialiseFromEmpty
@@ -129,6 +130,8 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		});
 
 	}
+	
+
 	/*$scope.register = function(){
 
 		LockFactory.register($scope.selectedAccount,$scope.device)
@@ -174,10 +177,40 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	$scope.grant = function(index){
 
+		var logServiceContract=LogService.deployed();
+		var filterOptions = {fromBlock:"latest",toBlock:"latest"};
+		
+		///////////////////////////////////////////////////////////////////
+		// Clear Up Any Previous Event Watchers
+		///////////////////////////////////////////////////////////////////
+		if(eventWatcher) EventFactory.stopWatching(eventWatcher);
+
+		///////////////////////////////////////////////////////////////////
+		// Create a new Event Watchers
+		///////////////////////////////////////////////////////////////////
+		eventWatcher = logServiceContract.AccessGranted({},filterOptions);
+		console.log(eventWatcher);
+
+		///////////////////////////////////////////////////////////////////
+		// Start Watching for the unlock event
+		///////////////////////////////////////////////////////////////////
+		EventFactory.startWatching(eventWatcher, function(error,result){
+			
+			resource = result.args.resource;
+			subject = result.args.subject;
+			if(subject == $scope.selectedAccount && resource == device.address){
+				$scope.$apply(function(){
+					$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
+				});
+			}
+			EventFactory.stopWatching(eventWatcher);	
+		});
+
+		///////////////////////////////////////////////////////////////////
+		// Run the Grant
+		///////////////////////////////////////////////////////////////////
 		PolicyFactory.grant($scope.selectedAccount, $scope.device.address, $scope.device.permissions[index])
 		.then(function(result){
-			
-			//Update The Screen???
 			console.log(result);
 		})
 	}
@@ -191,18 +224,44 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	$scope.revoke = function(index){
 
+		
+		var logServiceContract=LogService.deployed();
+		var filterOptions = {fromBlock:"latest",toBlock:"latest"};
+		
+		///////////////////////////////////////////////////////////////////
+		// Clear Up Any Previous Event Watchers
+		///////////////////////////////////////////////////////////////////
+		if(eventWatcher) EventFactory.stopWatching(eventWatcher);
+
+		///////////////////////////////////////////////////////////////////
+		// Create a new Event Watchers
+		///////////////////////////////////////////////////////////////////
+		eventWatcher = logServiceContract.AccessGranted({},filterOptions);
+		console.log(eventWatcher);
+
+		///////////////////////////////////////////////////////////////////
+		// Start Watching for the unlock event
+		///////////////////////////////////////////////////////////////////
+		EventFactory.startWatching(eventWatcher, function(error,result){
+			
+			resource = result.args.resource;
+			subject = result.args.subject;
+			if(subject == $scope.selectedAccount && resource == device.address){
+				$scope.$apply(function(){
+					$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
+					$scope.device.permissions[index].startDate=0;
+					$scope.device.permissions[index].endDate=0;
+					$scope.device.permissions[index].startDateString="";
+					$scope.device.permissions[index].endDateString="";
+					$scope.device.permissions[index].access=0;
+				});
+			}
+			EventFactory.stopWatching(eventWatcher);	
+		});
+
+
 		PolicyFactory.revoke($scope.selectedAccount, $scope.device.address, $scope.device.permissions[index])
 		.then(function(result){
-
-			// Should Really Have An Event Watcher To Update All Of This
-			$scope.$apply(function(){
-				$scope.device.permissions[index].startDate=0;
-				$scope.device.permissions[index].endDate=0;
-				$scope.device.permissions[index].startDateString="";
-				$scope.device.permissions[index].endDateString="";
-				$scope.device.permissions[index].access=0;
-				
-			});
 			console.log(result);
 		})
 	}
@@ -215,8 +274,8 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	// Issues the gtrant or revole procedure as appropriate
 	///////////////////////////////////////////////////////////////////////////
 	$scope.grantToUser = function (index){
-		$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
-		if($scope.device.permissions[index].grant){
+		//$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
+		if(!$scope.device.permissions[index].grant){
 			$scope.grant(index); return;
 		} 
 		$scope.revoke(index);
