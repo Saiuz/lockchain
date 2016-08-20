@@ -132,42 +132,6 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	}
 	
 
-	/*$scope.register = function(){
-
-		LockFactory.register($scope.selectedAccount,$scope.device)
-		.then(function(result){
-			console.log(result);
-			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
-			.then(function(result){
-				console.log(result);
-			});
-
-		});
-	}*/
-
-	///////////////////////////////////////////////////////////////////////////
-	// Function Register
-	///////////////////////////////////////////////////////////////////////////
-	// Registers and new devices and sets the requested permissions on the 
-	// Device as requested. Lock Factorry Register Returns a Blockchain
-	// Transaction Id. SetPolicy returns an array of transaction Ids
-	///////////////////////////////////////////////////////////////////////////
-	/*$scope.setPolicy = function(){
-
-		LockFactory.register($scope.selectedAccount,$scope.device)
-		.then(function(result){	
-			console.log(result);
-			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
-			.then(function(result){
-				console.log(result);	
-				$scope.$apply(function(){
-					$location.path("/");
-				});
-			});
-
-		});
-	}*/
-
 	///////////////////////////////////////////////////////////////////////////
 	// Function Grant
 	///////////////////////////////////////////////////////////////////////////
@@ -189,7 +153,6 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		// Create a new Event Watchers
 		///////////////////////////////////////////////////////////////////
 		eventWatcher = logServiceContract.AccessGranted({},filterOptions);
-		console.log(eventWatcher);
 
 		///////////////////////////////////////////////////////////////////
 		// Start Watching for the unlock event
@@ -237,7 +200,6 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		// Create a new Event Watchers
 		///////////////////////////////////////////////////////////////////
 		eventWatcher = logServiceContract.AccessGranted({},filterOptions);
-		console.log(eventWatcher);
 
 		///////////////////////////////////////////////////////////////////
 		// Start Watching for the unlock event
@@ -274,7 +236,6 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	// Issues the gtrant or revole procedure as appropriate
 	///////////////////////////////////////////////////////////////////////////
 	$scope.grantToUser = function (index){
-		//$scope.device.permissions[index].grant=!$scope.device.permissions[index].grant;
 		if(!$scope.device.permissions[index].grant){
 			$scope.grant(index); return;
 		} 
