@@ -77,7 +77,7 @@ angular.module("LockChain").controller("HomeController", ["$scope", "$rootScope"
 	function lock(index){
 
 		var logServiceContract = LogService.deployed();
-		var filterOptions = {fromBlock:0,toBlock:"latest"};
+		var filterOptions = {fromBlock:"latest",toBlock:"latest"};
 		
 		///////////////////////////////////////////////////////////////////
 		// Clear Up Any Previous Event Watchers

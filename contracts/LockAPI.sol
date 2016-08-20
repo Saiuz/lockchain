@@ -57,6 +57,7 @@ contract LockAPI is LockAPIBase(){
     // Map of Device address to Attributes (1-1)
     ////////////////////////////////////////////////////////////////////////////
     mapping(address=>identityAttributes) public lockAttrs;
+    mapping(address=>bool) public lockAttrsSet;
     
     ////////////////////////////////////////////////////////////////////////////
     // Map of Device address to Owner Address (1-1)
@@ -76,15 +77,28 @@ contract LockAPI is LockAPIBase(){
 
     function LockAPI(PolicyDecisionBase pdp, LogService logger) LockAPIBase(pdp,logger){}
     
-    function Register(address identity, bytes32 title, bytes32 model, bytes32 description, bool isLocked) returns(bool result){
+    function Register(address identity, bytes32 title, bytes32 model, bytes32 description, bool isLocked) requireAuthorisation(msg.sender, identity, DEMAND_ACCESS_1) returns(bool result){
         
-        identityAttributes memory newIdentity = identityAttributes(title,model,description,isLocked);
-        lockAttrs[identity] = newIdentity;
-        lockOwner[identity] = msg.sender;
-        ownerLock[msg.sender].push(identity);
-        ownerLockCount[msg.sender]++;
-        result = true;
+        bool exists = lockAttrsSet[identity];
+        if(!exists){
+           identityAttributes memory newIdentity = identityAttributes(title,model,description,isLocked);
+           lockAttrs[identity] = newIdentity;
+           lockAttrsSet[identity]=true;
+           lockOwner[identity] = msg.sender;
+           ownerLock[msg.sender].push(identity);
+           ownerLockCount[msg.sender]++;
+           result = true;
+           return;
+        }
+        
+        identityAttributes storage currentIdentity = lockAttrs[identity];
+        currentIdentity.title=title;
+        currentIdentity.model=model;
+        currentIdentity.description=description;
+        currentIdentity.isLocked=isLocked;
+        result=true;
     }
+    
     
     function Transfer(address identity, address newOwner) requireAuthorisation(msg.sender, identity, DEMAND_ACCESS_2) returns (bool result){
         address oldOwner = lockOwner[identity];

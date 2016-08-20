@@ -40,7 +40,13 @@ contract PolicyDecision is PolicyDecisionBase(){
     
     function IsAuthorised(address subject, address resource, uint8 required) constant returns (bool result){
         
+        if(!issuer.HasTokensForResource(subject,resource)){
+            result=true;
+            return;
+        }
+        
         var (issuedTo, issuedFor, startDate, endDate, access) = issuer.GetToken(subject,resource);
+        
         if(issuedTo != subject || issuedFor != resource){
             logger.LogAccessDenied("PDP",subject,resource);
             return false;
@@ -61,4 +67,3 @@ contract PolicyDecision is PolicyDecisionBase(){
         return true;
     }
 }
-

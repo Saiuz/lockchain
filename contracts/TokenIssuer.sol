@@ -4,6 +4,11 @@ import "./LogService.sol";
 
 contract TokenIssuer is Disposable{
     
+    modifier requireAuthorisation(address subject, address resource, uint8 accessRequired){ 
+       bool isAuthorised = IsAuthorised(subject, resource, accessRequired);
+       if(!isAuthorised) { return; } _
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     // Mapping Subject=>Resource=>Tokens
     // One Subject Has Many Resources and Each Resource Has One Token
@@ -33,7 +38,7 @@ contract TokenIssuer is Disposable{
     // Otherwise Create a New Contract and Store It In The Mapping
     // Add The Resource Address To The List Of Subject Resources
     ////////////////////////////////////////////////////////////////////////
-    function Grant(address subject, address resource, uint startDate, uint endDate, uint8 access) returns (address result){
+    function Grant(address subject, address resource, uint startDate, uint endDate, uint8 access) requireAuthorisation(msg.sender,resource,2) returns (address result){
     
         AccessToken token = AccessToken(tokenStore[subject][resource]);
         if(address(token)==0x0){
@@ -54,7 +59,7 @@ contract TokenIssuer is Disposable{
     // Subject Kill The Contract And Remove It From Mapping And Remove
     // The Resource Address from the List Of Subject Resources
     ////////////////////////////////////////////////////////////////////////
-    function Revoke(address subject, address resource) returns (bool result){
+    function Revoke(address subject, address resource) requireAuthorisation(msg.sender,resource,2) returns (bool result){
         AccessToken token = AccessToken(tokenStore[subject][resource]);
         if(address(token)==0x0) return false;
         var (issuedTo, issuedFor, startDate, endDate, access) = token.Serialize();
@@ -96,6 +101,16 @@ contract TokenIssuer is Disposable{
     ////////////////////////////////////////////////////////////////////////
     function GetTokensForResource(address resource) constant returns(address[] result){
         result=resourceSubjects[resource];
+    }
+    
+    ////////////////////////////////////////////////////////////////////////
+    // Get All The Resource Tokens Allocated To A Given Subject 
+    // Returns List Of Resources Addresses That Can Be Used In Conjunction
+    // With GetToken
+    ////////////////////////////////////////////////////////////////////////
+    function HasTokensForResource(address subject, address resource) constant returns(bool result){
+        address[] memory subjectItems = GetTokensForResource(resource);
+        result=(subjectItems.length > 0);
     }
     
     ////////////////////////////////////////////////////////////////////////
@@ -146,5 +161,42 @@ contract TokenIssuer is Disposable{
         result=resourceSubjects[resource];
     }
     
+    ////////////////////////////////////////////////////////////////////////
+    // Authorisation Rules
+    // GRANT msg.sender Must Be A Device Owner and must have token grant rights
+    // REVOKE msg.sender Must Be A Device Owner and have token revoke rights
+    // Subject = Requester (msg.sender)
+    // Resource = Object to manage access for
+    ////////////////////////////////////////////////////////////////////////    
+    function IsAuthorised(address subject, address resource, uint8 required) constant returns(bool result){
+        
+        var (issuedTo, issuedFor, startDate, endDate, access) = GetToken(subject,resource);
+        
+        // Check If Resource Is New - if so then there is no policy to check
+        // and the user is setting up something new and becoming the owner
+        if(!HasTokensForResource(subject,resource)){
+            result=true;
+            return;
+        }
+        
+        if(issuedTo != subject || issuedFor != resource){
+            logger.LogAccessDenied("PDP",subject,resource);
+            return false;
+        }
+        if(access < required){
+            logger.LogAccessDenied("PDP",subject,resource);
+            return false;
+        }
+        if(startDate != 0 && startDate > now){
+            logger.LogAccessDenied("PDP",subject,resource);
+            return false;
+        }
+        if(endDate != 0 && endDate < now){
+            logger.LogAccessDenied("PDP",subject,resource);
+            return false;
+        }
+        logger.LogAccessGranted("PDP",subject,resource);
+        return true;
+    }
+    
 }
-
