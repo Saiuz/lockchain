@@ -9,6 +9,13 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	
 	var tokenContract = TokenIssuer.deployed();
 
+	///////////////////////////////////////////////////////////////////////////
+	// GetPolicyForResource
+	///////////////////////////////////////////////////////////////////////////
+	// Returns List of Policy Tokens For A Resource
+	// These Can Then Be retreived Indivisually as Required
+	// Returns Promise
+	///////////////////////////////////////////////////////////////////////////
 	var getPolicyForResource = function(resource){
 		var promise =
 			tokenContract.GetTokensForResource(resource)
@@ -19,59 +26,6 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		return promise;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
-	// GetPolicy
-	///////////////////////////////////////////////////////////////////////////
-	// Gets the policy Saved agaisnt a given resource
-	// Policy Describes What Each Subject Can Do Against The Resource
-	// Returns Array of Policy Objects Via Callback
-	///////////////////////////////////////////////////////////////////////////
-	/*var getPolicy = function(resource){
-
-		var promise =
-			tokenContract.GetTokensForResource(resource)
-			.then(function(result){
-				var policyList = []; var promises = [];
-				for(i=0; i<result.length;i++){
-					policyList.push({subject:result[i]});
-					promises.push(tokenContract.GetToken(result[i],resource));
-				}
-				return Promise.all(promises).then(function(dataList){
-					var index = 0;
-					dataList.forEach(function(data){
-						policyList[index].issuedTo=data[0];
-						policyList[index].issuedFor=data[1];
-						policyList[index].startDateString="";
-						policyList[index].endDateString="";
-						policyList[index].startDate=0;
-						policyList[index].endDate=0;
-
-						if(data[2] > 0){
-							startDate = new Date(data[2]*1000);
-							policyList[index].startDate=startDate;
-							policyList[index].startDateString=startDate.toString("yyyy-MM-dd");
-						}
-						if(data[3] > 0){
-							endDate = new Date(data[3]*1000);
-							policyList[index].endDate=endDate;
-							policyList[index].endDateString=endDate.toString("yyyy-MM-dd");
-						}
-						policyList[index].access=data[4].toString();
-						index++;
-					});
-
-				})
-				.then(function(){
-					return policyList;
-				})
-				.catch(function(error){
-					console.log(error);
-				});
-			});
-			return promise;
-
-	};*/
-
 
 	///////////////////////////////////////////////////////////////////////////
 	// SetPolicy
@@ -81,7 +35,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	// Execute all promises
 	// Callback returns list of transaction identifiers
 	///////////////////////////////////////////////////////////////////////////
-	var setPolicy = function(account, resource){
+	/*var setPolicy = function(account, resource){
 		
 		var promises=[];
 		for(i=0;i < resource.permissions.length; i++){
@@ -103,7 +57,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 			});
 		return promise;	
 		
-	};
+	};*/
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -160,6 +114,14 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		
 	}
 
+	///////////////////////////////////////////////////////////////////////////
+	// getToken
+	///////////////////////////////////////////////////////////////////////////
+	// Retreives and Access Policy For The Given Resource and Account
+	// Formats the Data To Fit The Needs Of The UI for dates and big Numbers
+	///////////////////////////////////////////////////////////////////////////
+	// Returns Promise
+	///////////////////////////////////////////////////////////////////////////
 	var getToken = function(account, resource){
 		var promise =
 			tokenContract.GetToken(account,resource,{from:account})
@@ -206,7 +168,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 
 	return{
 		//getPolicy:getPolicy,
-		setPolicy:setPolicy,
+		//setPolicy:setPolicy,
 		grant:grant,
 		revoke:revoke,
 		getPolicyForResource:getPolicyForResource,

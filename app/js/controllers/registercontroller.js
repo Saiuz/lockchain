@@ -69,9 +69,9 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			})
 			.then(function(result){
 				console.log(result);
-				var promises = []; var policyList = [];
+				var promises = []; //var policyList = [];
 				for(i=0; i<result.length;i++){
-					policyList.push({subject:result[i]});
+					//policyList.push({subject:result[i]});
 					promises.push(PolicyFactory.getToken(result[i],resource));
 				}
 				return Promise.all(promises);
@@ -99,39 +99,6 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	}
 
 
-	/*function initialisefromData(resource){
-
-		LockFactory.getResource(resource)
-		.then(function(data){
-			console.log(data);
-			PolicyFactory.getPolicy(resource)
-			.then(function(result){
-				var permissions = []
-				for(i=0; i < $scope.accounts.length; i++){
-					permission = {name:$scope.accounts[i],startDate:0,endDate:0,startDateString:"",endDateString:"", access: 0, grant:false};
-					for(j=0; j < result.length; j++){
-						if(result[j].issuedTo == $scope.accounts[i]){
-							startDate=result[j].startDate;
-							endDate = result[j].endDate;
-							startDateString=result[j].startDateString;
-							endDateString=result[j].endDateString;
-							access = parseInt(result[j].access);
-							permission = {name:result[j].issuedTo,startDate:startDate,endDate:endDate, startDateString:startDateString, endDateString:endDateString, access:access, grant:true};
-							break;	
-						}
-					}
-					permissions[i] = permission;
-				}
-				data.permissions=permissions;
-				$scope.$apply(function(){
-					$scope.device=data;
-				});
-
-			});
-
-		});
-	}*/
-
 	///////////////////////////////////////////////////////////////////////////
 	// Function Register
 	///////////////////////////////////////////////////////////////////////////
@@ -144,13 +111,32 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		LockFactory.register($scope.selectedAccount,$scope.device)
 		.then(function(result){
 			console.log(result);
+		});		
+
+		var promises = []; 
+		for(i=0; i<$scope.device.permissions.length;i++){		
+			if($scope.device.permissions[i].grant){
+				promises.push(PolicyFactory.grant($scope.selectedAccount, $scope.device.address, $scope.device.permissions[i]));
+			}
+		}
+		Promise.all(promises)
+		.then(function(result){
+			console.log(result);
+		});
+
+	}
+	/*$scope.register = function(){
+
+		LockFactory.register($scope.selectedAccount,$scope.device)
+		.then(function(result){
+			console.log(result);
 			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
 			.then(function(result){
 				console.log(result);
 			});
 
 		});
-	}
+	}*/
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Register

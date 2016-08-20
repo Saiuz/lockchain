@@ -48319,9 +48319,9 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			})
 			.then(function(result){
 				console.log(result);
-				var promises = []; var policyList = [];
+				var promises = []; //var policyList = [];
 				for(i=0; i<result.length;i++){
-					policyList.push({subject:result[i]});
+					//policyList.push({subject:result[i]});
 					promises.push(PolicyFactory.getToken(result[i],resource));
 				}
 				return Promise.all(promises);
@@ -48349,39 +48349,6 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	}
 
 
-	/*function initialisefromData(resource){
-
-		LockFactory.getResource(resource)
-		.then(function(data){
-			console.log(data);
-			PolicyFactory.getPolicy(resource)
-			.then(function(result){
-				var permissions = []
-				for(i=0; i < $scope.accounts.length; i++){
-					permission = {name:$scope.accounts[i],startDate:0,endDate:0,startDateString:"",endDateString:"", access: 0, grant:false};
-					for(j=0; j < result.length; j++){
-						if(result[j].issuedTo == $scope.accounts[i]){
-							startDate=result[j].startDate;
-							endDate = result[j].endDate;
-							startDateString=result[j].startDateString;
-							endDateString=result[j].endDateString;
-							access = parseInt(result[j].access);
-							permission = {name:result[j].issuedTo,startDate:startDate,endDate:endDate, startDateString:startDateString, endDateString:endDateString, access:access, grant:true};
-							break;	
-						}
-					}
-					permissions[i] = permission;
-				}
-				data.permissions=permissions;
-				$scope.$apply(function(){
-					$scope.device=data;
-				});
-
-			});
-
-		});
-	}*/
-
 	///////////////////////////////////////////////////////////////////////////
 	// Function Register
 	///////////////////////////////////////////////////////////////////////////
@@ -48394,13 +48361,32 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		LockFactory.register($scope.selectedAccount,$scope.device)
 		.then(function(result){
 			console.log(result);
+		});		
+
+		var promises = []; 
+		for(i=0; i<$scope.device.permissions.length;i++){		
+			if($scope.device.permissions[i].grant){
+				promises.push(PolicyFactory.grant($scope.selectedAccount, $scope.device.address, $scope.device.permissions[i]));
+			}
+		}
+		Promise.all(promises)
+		.then(function(result){
+			console.log(result);
+		});
+
+	}
+	/*$scope.register = function(){
+
+		LockFactory.register($scope.selectedAccount,$scope.device)
+		.then(function(result){
+			console.log(result);
 			PolicyFactory.setPolicy($scope.selectedAccount,$scope.device)
 			.then(function(result){
 				console.log(result);
 			});
 
 		});
-	}
+	}*/
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Register
@@ -48695,6 +48681,13 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	
 	var tokenContract = TokenIssuer.deployed();
 
+	///////////////////////////////////////////////////////////////////////////
+	// GetPolicyForResource
+	///////////////////////////////////////////////////////////////////////////
+	// Returns List of Policy Tokens For A Resource
+	// These Can Then Be retreived Indivisually as Required
+	// Returns Promise
+	///////////////////////////////////////////////////////////////////////////
 	var getPolicyForResource = function(resource){
 		var promise =
 			tokenContract.GetTokensForResource(resource)
@@ -48705,59 +48698,6 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		return promise;
 	}
 
-	///////////////////////////////////////////////////////////////////////////
-	// GetPolicy
-	///////////////////////////////////////////////////////////////////////////
-	// Gets the policy Saved agaisnt a given resource
-	// Policy Describes What Each Subject Can Do Against The Resource
-	// Returns Array of Policy Objects Via Callback
-	///////////////////////////////////////////////////////////////////////////
-	/*var getPolicy = function(resource){
-
-		var promise =
-			tokenContract.GetTokensForResource(resource)
-			.then(function(result){
-				var policyList = []; var promises = [];
-				for(i=0; i<result.length;i++){
-					policyList.push({subject:result[i]});
-					promises.push(tokenContract.GetToken(result[i],resource));
-				}
-				return Promise.all(promises).then(function(dataList){
-					var index = 0;
-					dataList.forEach(function(data){
-						policyList[index].issuedTo=data[0];
-						policyList[index].issuedFor=data[1];
-						policyList[index].startDateString="";
-						policyList[index].endDateString="";
-						policyList[index].startDate=0;
-						policyList[index].endDate=0;
-
-						if(data[2] > 0){
-							startDate = new Date(data[2]*1000);
-							policyList[index].startDate=startDate;
-							policyList[index].startDateString=startDate.toString("yyyy-MM-dd");
-						}
-						if(data[3] > 0){
-							endDate = new Date(data[3]*1000);
-							policyList[index].endDate=endDate;
-							policyList[index].endDateString=endDate.toString("yyyy-MM-dd");
-						}
-						policyList[index].access=data[4].toString();
-						index++;
-					});
-
-				})
-				.then(function(){
-					return policyList;
-				})
-				.catch(function(error){
-					console.log(error);
-				});
-			});
-			return promise;
-
-	};*/
-
 
 	///////////////////////////////////////////////////////////////////////////
 	// SetPolicy
@@ -48767,7 +48707,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	// Execute all promises
 	// Callback returns list of transaction identifiers
 	///////////////////////////////////////////////////////////////////////////
-	var setPolicy = function(account, resource){
+	/*var setPolicy = function(account, resource){
 		
 		var promises=[];
 		for(i=0;i < resource.permissions.length; i++){
@@ -48789,7 +48729,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 			});
 		return promise;	
 		
-	};
+	};*/
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -48846,6 +48786,14 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 		
 	}
 
+	///////////////////////////////////////////////////////////////////////////
+	// getToken
+	///////////////////////////////////////////////////////////////////////////
+	// Retreives and Access Policy For The Given Resource and Account
+	// Formats the Data To Fit The Needs Of The UI for dates and big Numbers
+	///////////////////////////////////////////////////////////////////////////
+	// Returns Promise
+	///////////////////////////////////////////////////////////////////////////
 	var getToken = function(account, resource){
 		var promise =
 			tokenContract.GetToken(account,resource,{from:account})
@@ -48892,7 +48840,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 
 	return{
 		//getPolicy:getPolicy,
-		setPolicy:setPolicy,
+		//setPolicy:setPolicy,
 		grant:grant,
 		revoke:revoke,
 		getPolicyForResource:getPolicyForResource,
