@@ -47348,10 +47348,10 @@ module.exports = {
   "Disposable": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Disposable.sol.js"),
   "LockAPI": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js"),
   "LockAPIBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPIBase.sol.js"),
-  "LogService": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js"),
   "Migrations": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js"),
-  "PolicyDecision": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecision.sol.js"),
+  "LogService": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js"),
   "PolicyDecisionBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecisionBase.sol.js"),
+  "PolicyDecision": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecision.sol.js"),
   "TokenIssuer": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/TokenIssuer.sol.js"),
 };
 },{"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/AccessToken.sol.js":1,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Disposable.sol.js":2,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js":3,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPIBase.sol.js":4,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js":5,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js":6,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecision.sol.js":7,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecisionBase.sol.js":8,"/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/TokenIssuer.sol.js":9}]},{},[227])(227)
@@ -48442,31 +48442,6 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		$scope.revoke(index);
 	}	
 	
-
-}]);
-
-angular.module("LockChain").controller("TraceController", ["$scope", function($scope){
-
-	$scope.output="No output";
-
-	logContract = LogService.deployed();
-
-	var event = logContract.allEvents({},{fromBlock: 0, toBlock: "latest"},function(error,result){
-		console.log(result);
-		$scope.output=result;
-	});
-
-	$scope.trace = function(){
-	
-		logContract.TestTrace($scope.message).then(function(result){
-			console.log(result);
-		});
-	}
-
-	$scope.stop = function(){
-	
-		event.stopWatching();
-	}	
 
 }]);
 
