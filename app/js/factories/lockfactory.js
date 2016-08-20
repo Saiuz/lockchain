@@ -25,7 +25,11 @@ angular.module("LockChain").factory("LockFactory", function(){
 	// callback : function to execute when done
 	///////////////////////////////////////////////////////////////////////////
 	var register = function(account, resource){
-		var promise = lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account})
+		
+		console.log("REGISTER FACTORY ABOUT TO SAVE");
+		console.log(resource);	
+
+		var promise = lockContract.Register(resource.address, resource.title, resource.model, resource.description, resource.isLocked, {from:account,gas:1000000})
 		.then(function(result){
 			return result;
 		})

@@ -108,10 +108,14 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	///////////////////////////////////////////////////////////////////////////
 	$scope.register = function(){
 
+		console.log("REGISTER CONTROLLER ABOUT TO SAVE");
+		console.log($scope.device);	
 		LockFactory.register($scope.selectedAccount,$scope.device)
 		.then(function(result){
 			console.log(result);
 		});		
+
+		if($scope.editMode) return;
 
 		var promises = []; 
 		for(i=0; i<$scope.device.permissions.length;i++){		
@@ -145,7 +149,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	// Device as requested. Lock Factorry Register Returns a Blockchain
 	// Transaction Id. SetPolicy returns an array of transaction Ids
 	///////////////////////////////////////////////////////////////////////////
-	$scope.setPolicy = function(){
+	/*$scope.setPolicy = function(){
 
 		LockFactory.register($scope.selectedAccount,$scope.device)
 		.then(function(result){	
@@ -159,7 +163,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			});
 
 		});
-	}
+	}*/
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Grant
