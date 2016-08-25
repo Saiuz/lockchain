@@ -5,7 +5,7 @@
 // LD042 Advanced Web Engineering
 // Andrew Hall 2016
 ///////////////////////////////////////////////////////////////////////////////
-angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","$location", "LockFactory", "AccountFactory", "PolicyFactory", "EventFactory", function($scope,$routeParams,$location,LockFactory,AccountFactory,PolicyFactory,EventFactory){
+angular.module("LockChain").controller("RegisterController", ["$scope", "$routeParams","$location", "$timeout", "LockFactory", "AccountFactory", "PolicyFactory", "EventFactory", function($scope,$routeParams,$location,$timeout,LockFactory,AccountFactory,PolicyFactory,EventFactory){
 
 	console.log("Entered RegisterController");
 	$scope.accounts = AccountFactory.getAccounts();
@@ -114,6 +114,14 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 		LockFactory.register($scope.selectedAccount,$scope.device)
 		.then(function(result){
 			console.log(result);
+			$scope.$apply(function(){
+				$scope.statusMessage = "Saved Successfully";
+				$scope.showStatus = true;
+				$timeout(function(){
+					$scope.statusMessage=""; 
+					$scope.showStatus=false;
+				}, 2000);
+			})
 		});		
 
 		if($scope.editMode) return;
@@ -131,6 +139,11 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 
 	}
 	
+	function hideStatus(message){
+		$scope.status="";
+		$scope.showStatus=false;
+	}
+
 
 	///////////////////////////////////////////////////////////////////////////
 	// Function Grant
