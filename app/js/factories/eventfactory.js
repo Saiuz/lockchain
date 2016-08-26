@@ -75,12 +75,39 @@ angular.module("LockChain").factory("EventFactory", function(){
 	};
 
 
+	///////////////////////////////////////////////////////////////////////////
+	// Get the Block Details
+	// For Supplied block Number
+	///////////////////////////////////////////////////////////////////////////
+	var getBlock = function(blockNumber){
+		return web3.eth.getBlock(blockNumber);
+	};
+
+	///////////////////////////////////////////////////////////////////////////
+	// Get Transaction Receipt
+	// For Supplied Transaction Hash
+	///////////////////////////////////////////////////////////////////////////
+	var getTransaction = function(txnHash){
+		return web3.eth.getTransaction(txnHash);
+	};
+
+	///////////////////////////////////////////////////////////////////////////
+	// Get Transaction Receipt
+	// For Supplied Transaction Hash
+	///////////////////////////////////////////////////////////////////////////
+	var getTransactionReceipt = function(txnHash){
+		return web3.eth.getTransactionReceipt(txnHash);
+	};
+
 	return{
 		registerForEvents: registerForEvents,
 		startWatching:startWatching,
 		stopWatching:stopWatching,
 		getTransactionLog:getTransactionLog,
 		getEventLog:getEventLog,
+		getBlock:getBlock,
+		getTransaction:getTransaction,
+		getTransactionReceipt:getTransactionReceipt
 
 	};
 });

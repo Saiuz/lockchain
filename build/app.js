@@ -47346,8 +47346,8 @@ exports.createContext = Script.createContext = function (context) {
 module.exports = {
   "AccessToken": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/AccessToken.sol.js"),
   "Disposable": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Disposable.sol.js"),
-  "LockAPI": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js"),
   "LockAPIBase": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPIBase.sol.js"),
+  "LockAPI": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LockAPI.sol.js"),
   "LogService": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/LogService.sol.js"),
   "Migrations": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/Migrations.sol.js"),
   "PolicyDecision": require("/Users/Andrew/Desktop/Masters/Dissertation/LockChain/build/contracts/PolicyDecision.sol.js"),
@@ -47385,7 +47385,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[AccessToken,Disposable,LockAPIBase,LockAPI,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
@@ -48014,13 +48014,25 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		}
 		
 		filterOptions  = {fromBlock: firstBlock, toBlock: "latest"};
-		
+
 		EventFactory.getEventLog(filterOptions,function(error,result){
+			$scope.gasUsed = 0;
+			for(i=result.length-1; i>=0; i--){
+				var block = EventFactory.getBlock(result[i].blockNumber);
+				var txnReceipt = EventFactory.getTransactionReceipt(result[i].transactionHash);
+				var blockDateTime = new Date(block.timestamp*1000);
+				result[i].gasUsed = txnReceipt.gasUsed;
+				result[i].blockTimestamp = block.timestamp;
+				result[i].blockDateTime = blockDateTime.toString("dd-MM-yy HH:mm:ss");
+				if(i+1 < result.length && result[i].transactionHash == result[i+1].transactionHash){
+				   result[i].gasUsed = 0;
+				}
+				$scope.gasUsed += result[i].gasUsed;
+			}
 			$scope.$apply(function(){
 				$scope.eventLog = result;
-				console.log("Retreived Contract Events");			
-				console.log(result);
 			});
+
 		});
 		
 		//////////////////////////////////////////////////////
@@ -48030,6 +48042,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		return [];
 
 	}
+
 
 	///////////////////////////////////////////////////////////////////////
 	// Start Blockchain Event Trace
@@ -48051,6 +48064,14 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 				$scope.$apply(function(){
 					console.log("Received Event Notification");
 					$scope.eventStatus = $scope.watchStatus.Received + " " + result.event;
+					
+					var block = EventFactory.getBlock(result.blockNumber);
+					var txnReceipt = EventFactory.getTransactionReceipt(result.transactionHash);
+					var blockDateTime = new Date(block.timestamp*1000);
+					result.blockTimestamp = block.timestamp;
+					result.blockDateTime = blockDateTime.toString("dd-MM-yy HH:mm:ss");
+					result.gasUsed = txnReceipt.gasUsed;
+
 		        	$scope.event = result;
 		        	$rootScope.$broadcast("OnStatusChanged",{event:result.event});
 		        	getEventLog({});
@@ -48074,6 +48095,7 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		$scope.eventStatus = $scope.watchStatus.NotWatching;
 		
 	}
+
 
 }]);
 
@@ -48696,12 +48718,39 @@ angular.module("LockChain").factory("EventFactory", function(){
 	};
 
 
+	///////////////////////////////////////////////////////////////////////////
+	// Get the Block Details
+	// For Supplied block Number
+	///////////////////////////////////////////////////////////////////////////
+	var getBlock = function(blockNumber){
+		return web3.eth.getBlock(blockNumber);
+	};
+
+	///////////////////////////////////////////////////////////////////////////
+	// Get Transaction Receipt
+	// For Supplied Transaction Hash
+	///////////////////////////////////////////////////////////////////////////
+	var getTransaction = function(txnHash){
+		return web3.eth.getTransaction(txnHash);
+	};
+
+	///////////////////////////////////////////////////////////////////////////
+	// Get Transaction Receipt
+	// For Supplied Transaction Hash
+	///////////////////////////////////////////////////////////////////////////
+	var getTransactionReceipt = function(txnHash){
+		return web3.eth.getTransactionReceipt(txnHash);
+	};
+
 	return{
 		registerForEvents: registerForEvents,
 		startWatching:startWatching,
 		stopWatching:stopWatching,
 		getTransactionLog:getTransactionLog,
 		getEventLog:getEventLog,
+		getBlock:getBlock,
+		getTransaction:getTransaction,
+		getTransactionReceipt:getTransactionReceipt
 
 	};
 });

@@ -67,19 +67,21 @@
           <div class="table-responsive">
               <table class="table" ng-Show="event!=null">
                 <thead>
-                  <td><strong>Block Number</strong></td>
-                  <td><strong>Source</strong></td>
+                  <td><strong>Block</strong></td>
+                  <td><strong>TimeStamp</strong></td>
                   <td><strong>Description</strong></td> 
                   <td><strong>Subject</strong></td> 
-                  <td><strong>Resource</strong></td>     
+                  <td><strong>Resource</strong></td>  
+                  <td><strong>Gas</strong></td>     
                 </thead>
                 <tbody>
                   <tr>
                     <td>{{event.blockNumber}}</td>
-                    <td>{{event.event}}</td>
+                    <td>{{event.blockDateTime}}</td>
                     <td>{{toAscii(event.args.message)}}</td>
                     <td>{{event.args.subject}}</td>
                     <td>{{event.args.resource}}</td>
+                    <td class="text-right">{{event.gasUsed}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -93,19 +95,30 @@
             <div class="table-responsive">
               <table class="table">
                 <thead>
-                  <td><strong>Block Number</strong></td>
-                  <td><strong>Source</strong></td>
+                  <td><strong>Block</strong></td>
+                  <td><strong>Timestamp</strong></td>
                   <td><strong>Description</strong></td> 
                   <td><strong>Subject</strong></td> 
-                  <td><strong>Resource</strong></td>     
+                  <td><strong>Resource</strong></td>   
+                  <td><strong>Gas</strong></td>   
+                    
                 </thead>
                 <tbody>
                   <tr ng-repeat="event in eventLog | orderBy:'event.blockNumber':true">
                     <td>{{event.blockNumber}}</td>
-                    <td>{{event.event}}</td>
+                    <td>{{event.blockDateTime}}</td>
                     <td>{{toAscii(event.args.message)}}</td>
                     <td>{{event.args.subject}}</td>
                     <td>{{event.args.resource}}</td>
+                    <td class="text-right">{{event.gasUsed}}</td>
+                  </tr>
+                    <td><strong>Total</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right"><strong>{{gasUsed}}</strong></td>
+                  <tr>
                   </tr>
                 </tbody>
               </table>
