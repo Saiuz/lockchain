@@ -1,6 +1,9 @@
 
 
 <div class="jumbotron"> 
+	<div class="container">	
+		<h2>Account </h2> <p>{{selectedAccount}}</p>
+	</div>	
 </div>  
 <div class="container panel panel-default">  		
 	<h2>{{pageTitle}}</h2>
@@ -75,9 +78,7 @@
                 <tbody>
                   <tr ng-repeat="grant in device.permissions">
                     <td>{{grant.name}}</td>
-                    <td><!--<select id="accessLevel" class="form-control" ng-model="grant.access" 
-                  				ng-options="item for item in accessLevels"/>-->
-
+                    <td>
                   		<select class="form-control" ng-model="grant.access" ng-options="accessLevels.indexOf(access) as access for access in accessLevels"></select>
           			</td>
                     <td><input type="date" ng-model="grant.startDate" value="{{grant.startDateString}}" class="form-control"/></td>
@@ -95,7 +96,6 @@
 		</div>
 		<div class="col-sm-2">
 			<a class="btn btn-default btn-block btn-success" href="#/" role="button">Back</a>
-			<!--<button class="btn btn-success pull-right btn-block" ng-click="setPolicy()" role="button">Save</button>-->
         </div>
 	</div>
 </div>   

@@ -28,39 +28,6 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 
 
 	///////////////////////////////////////////////////////////////////////////
-	// SetPolicy
-	///////////////////////////////////////////////////////////////////////////
-	// Registers A New Device by calling web3 RPC Interface To Blockchain
-	// For Each Item To Create A Permission Create A Promise And Then
-	// Execute all promises
-	// Callback returns list of transaction identifiers
-	///////////////////////////////////////////////////////////////////////////
-	/*var setPolicy = function(account, resource){
-		
-		var promises=[];
-		for(i=0;i < resource.permissions.length; i++){
-			var item = resource.permissions[i];
-			if(item.grant){
-				var startDate = dateToUnixTimestamp(item.startDate);
-				var endDate = dateToUnixTimestamp(item.endDate);
-				var access  = item.access;
-				promises.push(tokenContract.Grant(item.name, resource.address, startDate, endDate, access, {from:account}));
-			}
-		}
-
-		var promise =
-			Promise.all(promises).then(function(txnList){
-				return txnList;
-			})
-			.catch(function(error){
-				console.log(error);
-			});
-		return promise;	
-		
-	};*/
-
-
-	///////////////////////////////////////////////////////////////////////////
 	// Grant
 	///////////////////////////////////////////////////////////////////////////
 	// Grants Rights To A Resource 
@@ -167,8 +134,6 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	}
 
 	return{
-		//getPolicy:getPolicy,
-		//setPolicy:setPolicy,
 		grant:grant,
 		revoke:revoke,
 		getPolicyForResource:getPolicyForResource,

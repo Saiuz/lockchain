@@ -83,18 +83,22 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		filterOptions  = {fromBlock: firstBlock, toBlock: "latest"};
 
 		EventFactory.getEventLog(filterOptions,function(error,result){
-			$scope.gasUsed = 0;
+			//$scope.gasUsed = 0;
 			for(i=result.length-1; i>=0; i--){
 				var block = EventFactory.getBlock(result[i].blockNumber);
-				var txnReceipt = EventFactory.getTransactionReceipt(result[i].transactionHash);
 				var blockDateTime = new Date(block.timestamp*1000);
-				result[i].gasUsed = txnReceipt.gasUsed;
 				result[i].blockTimestamp = block.timestamp;
 				result[i].blockDateTime = blockDateTime.toString("dd-MM-yy HH:mm:ss");
-				if(i+1 < result.length && result[i].transactionHash == result[i+1].transactionHash){
-				   result[i].gasUsed = 0;
-				}
-				$scope.gasUsed += result[i].gasUsed;
+
+				////////////////////////////////////////////////////////////////////////////////////
+				// Get Gas Used No Longer Required
+				////////////////////////////////////////////////////////////////////////////////////
+				//var txnReceipt = EventFactory.getTransactionReceipt(result[i].transactionHash);
+				//result[i].gasUsed = txnReceipt.gasUsed;
+				//if(i+1 < result.length && result[i].transactionHash == result[i+1].transactionHash){
+				//   result[i].gasUsed = 0;
+				//}
+				//$scope.gasUsed += result[i].gasUsed;
 			}
 			$scope.$apply(function(){
 				$scope.eventLog = result;
@@ -138,7 +142,6 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 					result.blockTimestamp = block.timestamp;
 					result.blockDateTime = blockDateTime.toString("dd-MM-yy HH:mm:ss");
 					result.gasUsed = txnReceipt.gasUsed;
-
 		        	$scope.event = result;
 		        	$rootScope.$broadcast("OnStatusChanged",{event:result.event});
 		        	getEventLog({});
