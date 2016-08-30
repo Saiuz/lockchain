@@ -39,6 +39,7 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 	function initialisefromEmpty(){
 
 		$scope.device.address=AccountFactory.getNextDeviceAddress();
+		$scope.device.owner = $scope.selectedAccount;
 		$scope.device.title="";
 		$scope.device.model="";
 		$scope.device.description="";
@@ -70,9 +71,8 @@ angular.module("LockChain").controller("RegisterController", ["$scope", "$routeP
 			})
 			.then(function(result){
 				console.log(result);
-				var promises = []; //var policyList = [];
+				var promises = []; 
 				for(i=0; i<result.length;i++){
-					//policyList.push({subject:result[i]});
 					promises.push(PolicyFactory.getToken(result[i],resource));
 				}
 				return Promise.all(promises);

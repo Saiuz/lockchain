@@ -18,7 +18,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	///////////////////////////////////////////////////////////////////////////
 	var getPolicyForResource = function(resource){
 		var promise =
-			tokenContract.GetTokensForResource(resource)
+			tokenContract.GetTokensForResource.call(resource)
 			.then(function(result){
 				return result;
 			});
@@ -91,7 +91,7 @@ angular.module("LockChain").factory("PolicyFactory", function(){
 	///////////////////////////////////////////////////////////////////////////
 	var getToken = function(account, resource){
 		var promise =
-			tokenContract.GetToken(account,resource,{from:account})
+			tokenContract.GetToken.call(account,resource,{from:account})
 			.then(function(data){
 				var token={name:account,startDate:0,endDate:0,startDateString:"",endDateString:""};
 				token.issuedTo = data[0];

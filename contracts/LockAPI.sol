@@ -47,6 +47,7 @@ contract LockAPIBase is Disposable{
 contract LockAPI is LockAPIBase(){
     
     struct identityAttributes{
+        address owner;
         bytes32 title;
         bytes32 model;
         bytes32 description;
@@ -81,7 +82,7 @@ contract LockAPI is LockAPIBase(){
         
         bool exists = lockAttrsSet[identity];
         if(!exists){
-           identityAttributes memory newIdentity = identityAttributes(title,model,description,isLocked);
+           identityAttributes memory newIdentity = identityAttributes(msg.sender,title,model,description,isLocked);
            lockAttrs[identity] = newIdentity;
            lockAttrsSet[identity]=true;
            lockOwner[identity] = msg.sender;
@@ -104,7 +105,7 @@ contract LockAPI is LockAPIBase(){
         address oldOwner = lockOwner[identity];
         lockOwner[identity] = newOwner;
         ownerLock[newOwner].push(identity);
-        
+        lockAttrs[identity].owner=newOwner;
         address[] oldOwnerItems = ownerLock[oldOwner];
         bool done = false;
         

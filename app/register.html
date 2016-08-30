@@ -8,8 +8,8 @@
 	<div class="row">
 		<div class="col-sm-6">
 			
-			<label for="subject">Owner</label>
-			<input ng-model="selectedAccount" type="text" id="subject" name="subject" placeholder="*Subject" class="form-control" readonly>
+			<label for="owner">Owner</label>
+			<input ng-model="device.owner" type="text" id="subject" name="owner" placeholder="*Owner" class="form-control" readonly>
 			<p>
 
 			<label for="address">Resource</label>
@@ -17,7 +17,7 @@
 			<p>
 
 			<label for="title">Title <small>(required)</small></label>
-			<input ng-model="device.title" type="text" id="title" name="title" placeholder="*Title" class="form-control">
+			<input ng-model="device.title" type="text" id="title" name="title" placeholder="*Title" class="form-control" autofocus>
 			<p>
 			
 			<label for="description">Description <small>(required)</small></label>

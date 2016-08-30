@@ -78,21 +78,22 @@ angular.module("LockChain").factory("LockFactory", function(){
 	var getRegisteredForAccount = function(account, callback){
 		
 		var promise = 
-			accessContract.GetTokensForSubject(account)
+			accessContract.GetTokensForSubject.call(account)
 			.then(function(result){
 				var deviceList = [];
 				var promises = [];
 				for(i=0; i<result.length;i++){
 					deviceList.push({address:result[i]});
-					promises.push(lockContract.lockAttrs(result[i]));
+					promises.push(lockContract.lockAttrs.call(result[i]));
 				}
 				return Promise.all(promises).then(function(dataList){
 					var index = 0;
 					dataList.forEach(function(data){
-						deviceList[index].title=web3.toAscii(data[0]);
-						deviceList[index].model=web3.toAscii(data[1]);
-						deviceList[index].description=web3.toAscii(data[2]);
-						deviceList[index].isLocked=data[3];
+						deviceList[index].owner=data[0];
+						deviceList[index].title=web3.toAscii(data[1]);
+						deviceList[index].model=web3.toAscii(data[2]);
+						deviceList[index].description=web3.toAscii(data[3]);
+						deviceList[index].isLocked=data[4];
 						index++;
 					});
 
@@ -118,14 +119,15 @@ angular.module("LockChain").factory("LockFactory", function(){
 	///////////////////////////////////////////////////////////////////////////
 	var getResource = function(resource){
 		var promise = 
-			lockContract.lockAttrs(resource)
+			lockContract.lockAttrs.call(resource)
 		    .then(function(data){
 		       	device={};
 				device.address=resource;
-				device.title=web3.toAscii(data[0]);
-				device.model=web3.toAscii(data[1]);
-				device.description=web3.toAscii(data[2]);
-				device.isLocked=data[3];
+				device.owner=data[0];
+				device.title=web3.toAscii(data[1]);
+				device.model=web3.toAscii(data[2]);
+				device.description=web3.toAscii(data[3]);
+				device.isLocked=data[4];
 				return device;
 		    }); 
 		return promise;       
