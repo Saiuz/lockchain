@@ -47389,7 +47389,7 @@ if (typeof web3 !== 'undefined') {
 
                                                               
 
-[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,PolicyDecision,Migrations,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
+[AccessToken,Disposable,LockAPI,LockAPIBase,LogService,Migrations,PolicyDecision,PolicyDecisionBase,TokenIssuer].forEach(function(contract) {         
 
   contract.setProvider(window.web3.currentProvider);          
 
