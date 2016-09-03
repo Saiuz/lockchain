@@ -44,7 +44,6 @@ contract("LockAPI", function(accounts) {
 
       return policyContract.Grant(owner, resources[0], 0, 0, 2)
       .then(function(result){
-          console.log(result);
           return policyContract.GetTokensForResource.call(resources[0]); 
       })
       .then(function(result){
@@ -52,7 +51,6 @@ contract("LockAPI", function(accounts) {
           return policyContract.GetToken.call(owner,resources[0]);
       })
       .then(function(result){
-          console.log(result);
           assert.equal(result[0], owner,"Incorrect Owner Assigned");
           assert.equal(result[1], resources[0],"Incorrect Resource Assigned");
           assert.equal(result[2], 0,"Incorrect Start Date Assigned");
@@ -71,7 +69,6 @@ contract("LockAPI", function(accounts) {
 
       return policyContract.Grant(subject_1, resources[0], 0, 0, 1)
       .then(function(result){
-          console.log(result);
           return policyContract.GetTokensForResource.call(resources[0]); 
       })
       .then(function(result){
@@ -79,7 +76,6 @@ contract("LockAPI", function(accounts) {
           return policyContract.GetToken.call(subject_1,resources[0]);
       })
       .then(function(result){
-          console.log(result);
           assert.equal(result[0], subject_1,"Incorrect Subject Assigned");
           assert.equal(result[1], resources[0],"Incorrect Resource Assigned");
           assert.equal(result[2], 0,"Incorrect Start Date Assigned");
@@ -98,7 +94,6 @@ contract("LockAPI", function(accounts) {
 
       return policyContract.Grant(subject_2, resources[0], 0, 0, 0)
       .then(function(result){
-          console.log(result);
           return policyContract.GetTokensForResource.call(resources[0]); 
       })
       .then(function(result){
@@ -106,7 +101,6 @@ contract("LockAPI", function(accounts) {
           return policyContract.GetToken.call(subject_2,resources[0]);
       })
       .then(function(result){
-          console.log(result);
           assert.equal(result[0], subject_2,"Incorrect Subject Assigned");
           assert.equal(result[1], resources[0],"Incorrect Resource Assigned");
           assert.equal(result[2], 0,"Incorrect Start Date Assigned");
@@ -125,7 +119,6 @@ contract("LockAPI", function(accounts) {
 
       return policyContract.Grant(subject_3, resources[0],t1, t2, 1)
       .then(function(result){
-          console.log(result);
           return policyContract.GetTokensForResource.call(resources[0]); 
       })
       .then(function(result){
@@ -133,7 +126,6 @@ contract("LockAPI", function(accounts) {
           return policyContract.GetToken.call(subject_3,resources[0]);
       })
       .then(function(result){
-          console.log(result);
           assert.equal(result[0], subject_3,"Incorrect Subject Assigned");
           assert.equal(result[1], resources[0],"Incorrect Resource Assigned");
           assert.equal(result[2], t1,"Incorrect Start Date Assigned");
@@ -152,7 +144,6 @@ contract("LockAPI", function(accounts) {
 
       return policyContract.Grant(subject_4, resources[0], 0, t1, 1)
       .then(function(result){
-          console.log(result);
           return policyContract.GetTokensForResource.call(resources[0]); 
       })
       .then(function(result){
@@ -160,7 +151,6 @@ contract("LockAPI", function(accounts) {
           return policyContract.GetToken.call(subject_4,resources[0]);
       })
       .then(function(result){
-          console.log(result);
           assert.equal(result[0], subject_4,"Incorrect Subject Assigned");
           assert.equal(result[1], resources[0],"Incorrect Resource Assigned");
           assert.equal(result[2], 0,"Incorrect Start Date Assigned");
