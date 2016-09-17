@@ -26,14 +26,14 @@ Install Truffle
 
 ##3. Installing the application
 
-In a new command shell clone the Lockchain repository into the desired folder
+In a new command shell clone the Lockchain repository into the lockchain folder
+Use your own folder name if you like
 	
 	mkdir lockchain
-	cd lockchain
-	git clone https://github.com/ah903/lockchain.git
+	git clone https://github.com/ah903/lockchain.git lockchain
 
 ##4. Starting the Blockchain
-In a new command shell run 
+In a new command shell change to the lockchain directory and run 
 	```
 	testrpc -a5 -d
 	```
@@ -46,8 +46,10 @@ The smart contract source code is included in the git repository. To deploy thes
 
 * Ensure the TESTRPC instance is running
 
-* From a new command shell window type
-    ```truffle migrate```
+* From a new command shell window change to the lockchain directory and type
+    ```
+    truffle migrate
+    ```
 
 This command runs the deployment scripts in the migrations folder. The contracts are mined into the blockchain
 
@@ -57,8 +59,6 @@ This command runs the deployment scripts in the migrations folder. The contracts
 
 The applcation may now be started. This can be served by any web server but the most convenient way to start the application is by running
 	
-	
-	truffle build
 	truffle serve 
 
 The application will be served by default at http://localhost:8080
