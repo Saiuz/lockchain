@@ -2,11 +2,14 @@ import "./Disposable.sol";
 import "./AccessToken.sol";
 import "./LogService.sol";
 
+/// @title TokenIssuer
+/// @author Andrew Hall
+/// @notice Access Rights Token Factory 
 contract TokenIssuer is Disposable{
     
     modifier requireAuthorisation(address subject, address resource, uint8 accessRequired){ 
        bool isAuthorised = IsAuthorised(subject, resource, accessRequired);
-       if(!isAuthorised) { return; } _
+       if(!isAuthorised) { return; } _ 
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -26,18 +29,20 @@ contract TokenIssuer is Disposable{
     ////////////////////////////////////////////////////////////////////////////
     LogService logger;
     
-    ////////////////////////////////////////////////////////////////////////////
-    // Constructor Function
-    ////////////////////////////////////////////////////////////////////////////
+    /// @notice TokenIssuer Constructor Function
+    /// @param logService address of LogService Contract
     function TokenIssuer(LogService logService){
         logger = logService;
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // If Access Token Contract Already Exists Edit It
-    // Otherwise Create a New Contract and Store It In The Mapping
-    // Add The Resource Address To The List Of Subject Resources
-    ////////////////////////////////////////////////////////////////////////
+    /// @notice Access Token Contract Already Exists Edit It Otherwise Create a New Contract 
+    /// and Store It In The Mapping Add The Resource Address To The List Of Subject Resources
+    /// @param subject to grant access to
+    /// @param resource to grant access on
+    /// @param startDate to begin access (0 denotes unrestricted)
+    /// @param endDate to stop access (0 denotes unrestricted)
+    /// @param access level to grant
+    /// @return address
     function Grant(address subject, address resource, uint startDate, uint endDate, uint8 access) requireAuthorisation(msg.sender,resource,2) returns (address result){
     
         AccessToken token = AccessToken(tokenStore[subject][resource]);
@@ -54,11 +59,13 @@ contract TokenIssuer is Disposable{
         result = token;
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // If Access Token Contract Exists For The Resource Against The
-    // Subject Kill The Contract And Remove It From Mapping And Remove
-    // The Resource Address from the List Of Subject Resources
-    ////////////////////////////////////////////////////////////////////////
+    
+    /// @notice If Access Token Contract Exists For The Resource Against The
+    /// Subject Kill The Contract And Remove It From Mapping And Remove
+    /// The Resource Address from the List Of Subject Resources
+    /// @param subject to grant access to
+    /// @param resource to grant access on
+    /// @return boolean
     function Revoke(address subject, address resource) requireAuthorisation(msg.sender,resource,2) returns (bool result){
         AccessToken token = AccessToken(tokenStore[subject][resource]);
         if(address(token)==0x0) return false;
@@ -75,48 +82,55 @@ contract TokenIssuer is Disposable{
         result=false;
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // Serialise the access token allocated to the given subject for 
-    // the given Resource
-    ////////////////////////////////////////////////////////////////////////
+    /// @notice Serialise the access token allocated to the given subject for 
+    /// the given Resource
+    /// The Resource Address from the List Of Subject Resources
+    /// @param subject to grant access to
+    /// @param resource to grant access on
+    /// @return issuedTo token issued to subject
+    /// @return issuedFor token issued for resource
+    /// @return startDate token startdate
+    /// @return endDate token end date
+    /// @return access to grant access on
     function GetToken(address subject, address resource) constant returns (address issuedTo, address issuedFor, uint startDate, uint endDate, uint access){
         AccessToken token = AccessToken(tokenStore[subject][resource]);
         if(address(token)==0x0) return;
         (issuedTo, issuedFor, startDate, endDate, access) = token.Serialize();
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // Get All The Resource Tokens Allocated To A Given Subject 
-    // Returns List Of Resources Addresses That Can Be Used In Conjunction
-    // With GetToken
-    ////////////////////////////////////////////////////////////////////////
+    /// @notice Get All The Resource Tokens Allocated To A Given Subject 
+    /// Returns List Of Resources Addresses That Can Be Used In Conjunction
+    /// With GetToken The Resource Address from the List Of Subject Resources
+    /// @param subject to return tokens for
+    /// @return array
     function GetTokensForSubject(address subject) constant returns(address[] result){
         result=subjectResources[subject];
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // Get All The Resource Tokens Allocated To A Given Subject 
-    // Returns List Of Resources Addresses That Can Be Used In Conjunction
-    // With GetToken
-    ////////////////////////////////////////////////////////////////////////
+    /// @notice Get All The Resource Tokens Allocated To A Given Subject 
+    /// Returns List Of Resources Addresses That Can Be Used In Conjunction
+    /// With GetToken The Resource Address from the List Of Subject Resources
+    /// @param resource to return tokens for
+    /// @return array
     function GetTokensForResource(address resource) constant returns(address[] result){
         result=resourceSubjects[resource];
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // Get All The Resource Tokens Allocated To A Given Subject 
-    // Returns List Of Resources Addresses That Can Be Used In Conjunction
-    // With GetToken
-    ////////////////////////////////////////////////////////////////////////
+    /// @notice Returns true if a resource has capabilities allocated on it 
+    /// The Resource Address from the List Of Subject Resources
+    /// @param subject to return tokens for
+    /// @param resource to return tokens for
+    /// @return boolean
     function HasTokensForResource(address subject, address resource) constant returns(bool result){
         address[] memory subjectItems = GetTokensForResource(resource);
         result=(subjectItems.length > 0);
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // Helper Function To Remove An Element From The Subject Resource
-    // Array Coresponsing To A Particular Resource For The Subject
-    ////////////////////////////////////////////////////////////////////////
+    /// @notice internal helper Function To Remove An Element From The Subject Resource
+    /// rray Coresponsing To A Particular Resource For The Subject
+    /// @param subject to return tokens for
+    /// @param resource to return tokens for
+    /// @return array tokens
     function RemoveResourceForSubject(address subject, address resource) private returns (address[] result){
         
         address[] resourceItems = subjectResources[subject];
@@ -137,10 +151,11 @@ contract TokenIssuer is Disposable{
         result=subjectResources[subject];
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // Helper Function To Remove An Element From The Subject Resource
-    // Array Coresponsing To A Particular Resource For The Subject
-    ////////////////////////////////////////////////////////////////////////
+    /// @notice internal helper Function To Remove An Element From The Subject Resource
+    /// array Coresponsing To A Particular Resource For The Subject
+    /// @param subject to return tokens for
+    /// @param resource to return tokens for
+    /// @return array tokens
     function RemoveSubjectForResource(address resource, address subject) private returns (address[] result){
         
         address[] subjectItems = resourceSubjects[resource];
@@ -161,13 +176,15 @@ contract TokenIssuer is Disposable{
         result=resourceSubjects[resource];
     }
     
-    ////////////////////////////////////////////////////////////////////////
-    // Authorisation Rules
-    // GRANT msg.sender Must Be A Device Owner and must have token grant rights
-    // REVOKE msg.sender Must Be A Device Owner and have token revoke rights
-    // Subject = Requester (msg.sender)
-    // Resource = Object to manage access for
-    ////////////////////////////////////////////////////////////////////////    
+    /// @notice IsAuthorised used to protect this contract
+    /// GRANT msg.sender Must Be A Device Owner and must have token grant rights
+    /// EVOKE msg.sender Must Be A Device Owner and have token revoke rights
+    /// Subject = Requester (msg.sender) 
+    /// Resource = Object to manage access for
+    /// @param subject to test
+    /// @param resource to test
+    /// @param required minimum access level 
+    /// @return array tokens   
     function IsAuthorised(address subject, address resource, uint8 required) constant returns(bool result){
         
         var (issuedTo, issuedFor, startDate, endDate, access) = GetToken(subject,resource);

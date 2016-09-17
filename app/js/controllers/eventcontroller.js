@@ -54,8 +54,8 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		var lastBlock = 0;
 		var firstBlock = 0;
 
-		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 20){
-			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
+		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 200){
+			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-200;	
 		}
 		
 		filterOptions  = {address: lockAPIContract.address, fromBlock: firstBlock, toBlock: "latest"};
@@ -76,8 +76,8 @@ angular.module("LockChain").controller("EventController", ["$scope", "$rootScope
 		
 		var lastBlock = 0; var firstBlock = 0;
 
-		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 20){
-			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-20;	
+		if(web3.eth.getBlock("latest").transactions.length >0 && web3.eth.getBlock("latest").transactions[0].blockNumber > 200){
+			firstBlock = web3.eth.getBlock("latest").transactions[0].blockNumber-200;	
 		}
 		
 		filterOptions  = {fromBlock: firstBlock, toBlock: "latest"};
